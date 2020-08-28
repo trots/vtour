@@ -1,0 +1,21 @@
+{
+        "name": "vtour",
+        "version": "1.0.0",
+        "dependencies": {
+                "browserify": "^16.5.1",
+                "mkdirp": "^1.0.4",
+                "ncp": "^2.0.0",
+                "rimraf": "^3.0.2",
+                "uglify-es": "^3.3.9"
+        },
+        "scripts": {
+                "clean": "rimraf dist",
+                "mkdir": "mkdirp dist",
+                "js-debug": "browserify src/TourFactory.js --standalone TourFactory > dist/vtour.js",
+                "js-release": "browserify src/TourFactory.js | uglifyjs -o dist/vtour.min.js",
+                "lib-debug": "ncp lib/three.js dist/three.js & ncp lib/OrbitControls.js dist/OrbitControls.js",
+                "lib-release": "ncp lib/three.min.js dist/three.min.js & ncp lib/OrbitControls.js dist/OrbitControls.js",
+                "build-debug": "npm run clean & npm run mkdir & npm run js-debug & npm run lib-debug",
+                "build-release": "npm run clean & npm run mkdir & npm run js-release & npm run lib-release"
+        }
+}
