@@ -3,7 +3,7 @@ const Tour = require("./Tour.js");
 class TourFactory {
     static start(tourData) {
         var tour = new Tour(tourData.type);
-        tour.setPortalTexture(tourData.portalImage);
+        tour.setPortalTexture(tourData.normalPortalImage, tourData.hoveredPortalImage);
 
         for (let i = 0; i < tourData.scenes.length; i++) {
             const sceneData = tourData.scenes[i];

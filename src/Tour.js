@@ -8,8 +8,8 @@ class Tour {
         this._scene.addEventListener("portalclicked", (event) => {this._onTransitionActivated(event);} );
     }
 
-    setPortalTexture(imagePath) {
-        this._scene.setPortalTexture(imagePath);
+    setPortalTexture(normalStateImage, hoveredStateImage) {
+        this._scene.setPortalTexture(normalStateImage, hoveredStateImage);
     }
 
     addScene(sceneData) {

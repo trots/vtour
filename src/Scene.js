@@ -1,3 +1,5 @@
+const SceneObjectStateEnum = require("./SceneObjectStateEnum.js");
+
 class Scene {
     constructor() {
         this._textureLoader = new THREE.TextureLoader();
@@ -10,15 +12,19 @@ class Scene {
         this._controls = new THREE.OrbitControls(this._camera, this._renderer.domElement);
         this._raycaster = new THREE.Raycaster(); 
         this._mouse = new THREE.Vector2();
+
         this._portals = new Array();
         this._hoveredPortal = NaN;
-        this._portalTexture = "";
+        this._portalTexture = {};
+        this._portalTexture[SceneObjectStateEnum.Normal] = "";
+        this._portalTexture[SceneObjectStateEnum.Hovered] = "";
 
         Object.assign( Scene.prototype, THREE.EventDispatcher.prototype );
     }
 
-    setPortalTexture(portalTexture) {
-        this._portalTexture = portalTexture;
+    setPortalTexture(portalNormalTexture, portalHoveredTexture) {
+        this._portalTexture[SceneObjectStateEnum.Normal] = portalNormalTexture;
+        this._portalTexture[SceneObjectStateEnum.Hovered] = portalHoveredTexture;
     }
 
     init(data) {
@@ -55,9 +61,9 @@ class Scene {
 
         if (intersectedObjects.length > 0) {
             this._hoveredPortal = intersectedObjects[0].object;
-            this._hoveredPortal.material.color.set(0xff0000);
+            this._setPortalState(this._hoveredPortal, SceneObjectStateEnum.Hovered);
         } else if (this._hoveredPortal) {
-            this._hoveredPortal.material.color.set(0xffffff);
+            this._setPortalState(this._hoveredPortal, SceneObjectStateEnum.Normal);
             this._hoveredPortal = NaN;
         }
     }
@@ -76,6 +82,51 @@ class Scene {
 
     _onTextureLoadError(err) {
         console.log(err);
+    }
+
+    _createTransitionPortals() {
+        this._portals = [];
+
+        for (let i = 0; i < this._data.transitions.length; i++) {
+            const transition = this._data.transitions[i];
+            const portalGeometry = new THREE.PlaneGeometry(32, 32);
+            const portalMaterial = new THREE.MeshBasicMaterial(
+                { color: 0xff0000, transparent: true, side: THREE.DoubleSide }
+            );
+
+            let portalMesh = new THREE.Mesh( portalGeometry, portalMaterial);
+            portalMesh.position.set(0, 0, -this._cylinderRadius * transition.point.radius);
+            portalMesh.userData = {uid: transition.toUid};
+            this._setPortalState(portalMesh, SceneObjectStateEnum.Normal);
+
+            let pivot = new THREE.Group();
+            this._scene.add( pivot );
+            pivot.add( portalMesh );
+            pivot.rotateOnAxis(new THREE.Vector3(0, 1, 0), transition.point.angle);
+
+            this._portals.push(portalMesh);
+        }
+    }
+
+    _setPortalState(portalMesh, state) {
+        switch(state) {
+            case SceneObjectStateEnum.Hovered:
+                document.body.style.cursor = "pointer";
+                this._textureLoader.load(this._portalTexture[SceneObjectStateEnum.Hovered], 
+                                        (texture) => {
+                                            portalMesh.material.map = texture;
+                                            portalMesh.material.color = NaN;
+                                        });
+                break;
+
+            default:
+                document.body.style.cursor = "auto";
+                this._textureLoader.load(this._portalTexture[SceneObjectStateEnum.Normal], 
+                                        (texture) => {
+                                            portalMesh.material.map = texture;
+                                            portalMesh.material.color = NaN;
+                                        });
+        }
     }
 
     _clear() {

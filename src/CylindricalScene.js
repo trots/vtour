@@ -31,29 +31,6 @@ class CylindricalScene extends Scene {
         this._createTransitionPortals();
         this.render();
     }
-
-    _createTransitionPortals() {
-        this._portals = [];
-
-        for (let i = 0; i < this._data.transitions.length; i++) {
-            const transition = this._data.transitions[i];
-            const portalGeometry = new THREE.PlaneGeometry(32, 32);
-            const portalTexture = this._textureLoader.load(this._portalTexture);
-            let portalMesh = new THREE.Mesh( portalGeometry, new THREE.MeshBasicMaterial(
-                { map: portalTexture, transparent: true, side: THREE.DoubleSide }
-            ) );
-            
-            portalMesh.position.set(0, 0, -this._cylinderRadius * transition.point.radius);
-            portalMesh.userData = {uid: transition.toUid};
-
-            let pivot = new THREE.Group();
-            this._scene.add( pivot );
-            pivot.add( portalMesh );
-            pivot.rotateOnAxis(new THREE.Vector3(0, 1, 0), transition.point.angle);
-
-            this._portals.push(portalMesh);
-        }
-    }
 }
 
 module.exports = CylindricalScene;
