@@ -37,6 +37,10 @@ class Tour {
         this._scene.mouseClick(event);
     }
 
+    mouseWheel(event) {
+        this._scene.mouseWheel(event);
+    }
+
     _onTransitionActivated(event) {
         if (!this._sceneDataMap.has(event.uid)) {
             throw new Error("Unable start a tour. Unknown scene UID");

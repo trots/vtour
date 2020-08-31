@@ -10,6 +10,8 @@ class Scene {
         document.body.appendChild( this._renderer.domElement );
 
         this._controls = new THREE.OrbitControls(this._camera, this._renderer.domElement);
+        this._controls.enableZoom = false;
+
         this._raycaster = new THREE.Raycaster(); 
         this._mouse = new THREE.Vector2();
 
@@ -76,6 +78,23 @@ class Scene {
         this.dispatchEvent( { type: "portalclicked", uid: this._hoveredPortal.userData.uid } );
     }
 
+    mouseWheel(event) {
+        const MinZoom = 1.0;
+        const MaxZoom = 3.0;
+        const ZoomStep = 0.02;
+
+        event.preventDefault();
+        this._camera.zoom += event.deltaY * -ZoomStep;
+
+        if (this._camera.zoom < MinZoom) {
+            this._camera.zoom = MinZoom;
+        } else if (this._camera.zoom > MaxZoom) {
+            this._camera.zoom = MaxZoom;
+        }
+
+        this._camera.updateProjectionMatrix();
+    }
+
     _onTextureLoaded(_texture) {
         throw new Error("No implementation of Scene._onTextureLoaded");
     }
@@ -134,6 +153,7 @@ class Scene {
             this._scene.remove(this._scene.children[0]);
         }
 
+        this._camera.zoom = 1.0;
         this._cylinder = NaN;
         this._data = NaN;
         this._cylinderRadius = 0;
