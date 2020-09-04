@@ -12,13 +12,20 @@ class CylindricalScene extends Scene {
         this._cylinderRadius = 0;
     }
 
+    mouseWheel(event) {
+        super.mouseWheel(event);
+        const viewAngleDiff = (this._camera.fov - this._camera.getEffectiveFOV()) * (Math.PI / 180);
+        this._controls.maxPolarAngle = Math.PI / 2 + viewAngleDiff / 2;
+        this._controls.minPolarAngle = Math.PI / 2 - viewAngleDiff / 2;
+    }
+
     _onTextureLoaded(texture) {
         this._cylinderRadius = texture.image.width / (2 * Math.PI);
         const cylinderHeight = texture.image.height;
 
         this._camera.fov = Math.atan((cylinderHeight / 2) / this._cylinderRadius) * 180 / Math.PI * 2;
         this._camera.near = 1;
-        this._camera.far = this._cylinderRadius + 10;
+        this._camera.far = this._cylinderRadius + this._cylinderRadius * 0.2;
         this._camera.updateProjectionMatrix();
         this._camera.position.set( 0, 0, 10 );
         this._camera.lookAt(0, 0, 0);
@@ -30,6 +37,12 @@ class CylindricalScene extends Scene {
 
         this._createTransitionPortals();
         this.render();
+    }
+
+    _clear() {
+        super._clear();
+        this._controls.maxPolarAngle = Math.PI/2;
+        this._controls.minPolarAngle = Math.PI/2;
     }
 }
 
