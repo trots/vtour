@@ -12,6 +12,10 @@ class Tour {
         this._scene.setPortalTexture(normalStateImage, hoveredStateImage);
     }
 
+    setZoom(zoomMin, zoomMax, zoomSpeed) {
+        this._scene.setZoom(zoomMin, zoomMax, zoomSpeed);
+    }
+
     addScene(sceneData) {
         this._sceneDataMap.set(sceneData.uid, sceneData);
     }

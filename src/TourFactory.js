@@ -4,6 +4,7 @@ class TourFactory {
     static start(tourData) {
         var tour = new Tour(tourData.type);
         tour.setPortalTexture(tourData.normalPortalImage, tourData.hoveredPortalImage);
+        tour.setZoom(tourData.zoomMin, tourData.zoomMax, tourData.zoomSpeed);
 
         for (let i = 0; i < tourData.scenes.length; i++) {
             const sceneData = tourData.scenes[i];

@@ -2,6 +2,10 @@ const SceneObjectStateEnum = require("./SceneObjectStateEnum.js");
 
 class Scene {
     constructor() {
+        this._zoomMin = 1.0;
+        this._zoomMax = 3.0;
+        this._zoomSpeed = 0.02;
+
         this._textureLoader = new THREE.TextureLoader();
         this._scene = new THREE.Scene();
         this._camera = new THREE.PerspectiveCamera();
@@ -27,6 +31,12 @@ class Scene {
     setPortalTexture(portalNormalTexture, portalHoveredTexture) {
         this._portalTexture[SceneObjectStateEnum.Normal] = portalNormalTexture;
         this._portalTexture[SceneObjectStateEnum.Hovered] = portalHoveredTexture;
+    }
+
+    setZoom(zoomMin, zoomMax, zoomSpeed) {
+        this._zoomMin = zoomMin;
+        this._zoomMax = zoomMax;
+        this._zoomSpeed = zoomSpeed;
     }
 
     init(data) {
@@ -79,17 +89,13 @@ class Scene {
     }
 
     mouseWheel(event) {
-        const MinZoom = 1.0;
-        const MaxZoom = 3.0;
-        const ZoomStep = 0.02;
-
         event.preventDefault();
-        this._camera.zoom += event.deltaY * -ZoomStep;
+        this._camera.zoom += event.deltaY * -this._zoomSpeed;
 
-        if (this._camera.zoom < MinZoom) {
-            this._camera.zoom = MinZoom;
-        } else if (this._camera.zoom > MaxZoom) {
-            this._camera.zoom = MaxZoom;
+        if (this._camera.zoom < this._zoomMin) {
+            this._camera.zoom = this._zoomMin;
+        } else if (this._camera.zoom > this._zoomMax) {
+            this._camera.zoom = this._zoomMax;
         }
 
         this._camera.updateProjectionMatrix();
