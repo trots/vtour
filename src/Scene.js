@@ -19,6 +19,12 @@ class Scene {
         this._raycaster = new THREE.Raycaster(); 
         this._mouse = new THREE.Vector2();
 
+        this._nameLabel = document.createElement("div");
+        this._nameLabel.className = "scene-name";
+        this._nameLabel.style = "position:absolute; top:5px; left:5px; color:white; font-size:1.5em;\
+            background-color:#a6a6a687; padding:5px; border-radius:2px;";
+        document.body.appendChild(this._nameLabel);
+
         this._portals = new Array();
         this._hoveredPortal = NaN;
         this._portalTexture = {};
@@ -47,6 +53,8 @@ class Scene {
             (texture) => {this._onTextureLoaded(texture);},
             undefined,
             (err) => {this._onTextureLoadError(err);});
+
+        this._nameLabel.innerHTML = this._data.title;
     }
 
     resize(width, height) {
