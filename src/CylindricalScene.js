@@ -37,6 +37,8 @@ class CylindricalScene extends Scene {
 
         this._createTransitionPortals();
         this.render();
+
+        super._onTextureLoaded();
     }
 
     _clear() {

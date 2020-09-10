@@ -25,6 +25,14 @@ class Scene {
             background-color:#a6a6a687; padding:5px; border-radius:2px;";
         document.body.appendChild(this._nameLabel);
 
+        this._loadingPlaceholder = document.createElement("div");
+        this._loadingPlaceholder.className = "loading-placeholder";
+        this._loadingPlaceholder.style = "position:absolute; top:50%; left:0px; color:white; font-size:1.5em;\
+            width:100%; height:50px; text-align:center;";
+        this._loadingPlaceholder.innerHTML = "Loading..."
+        document.body.appendChild(this._loadingPlaceholder);
+        this._setLoaderVisibility(false);
+
         this._portals = new Array();
         this._hoveredPortal = NaN;
         this._portalTexture = {};
@@ -55,6 +63,7 @@ class Scene {
             (err) => {this._onTextureLoadError(err);});
 
         this._nameLabel.innerHTML = this._data.title;
+        this._setLoaderVisibility(true);
     }
 
     resize(width, height) {
@@ -110,11 +119,12 @@ class Scene {
     }
 
     _onTextureLoaded(_texture) {
-        throw new Error("No implementation of Scene._onTextureLoaded");
+        this._setLoaderVisibility(false);
     }
 
     _onTextureLoadError(err) {
         console.log(err);
+        this._setLoaderVisibility(false);
     }
 
     _createTransitionPortals() {
@@ -160,6 +170,11 @@ class Scene {
                                             portalMesh.material.color = NaN;
                                         });
         }
+    }
+
+    _setLoaderVisibility(visible) {
+        this._loadingPlaceholder.style.visibility = visible ? "visible" : "hidden";
+        this._nameLabel.style.visibility = visible ? "hidden" : "visible";
     }
 
     _clear() {
