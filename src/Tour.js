@@ -16,6 +16,10 @@ class Tour {
         this._scene.setZoom(zoomMin, zoomMax, zoomSpeed);
     }
 
+    setLang(lang) {
+        this._scene.setLang(lang);
+    }
+
     addScene(sceneData) {
         this._sceneDataMap.set(sceneData.uid, sceneData);
     }

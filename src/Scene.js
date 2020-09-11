@@ -1,4 +1,5 @@
 const SceneObjectStateEnum = require("./SceneObjectStateEnum.js");
+const WaiterWidget = require("./WaiterWidget.js");
 
 class Scene {
     constructor() {
@@ -25,13 +26,8 @@ class Scene {
             background-color:#a6a6a687; padding:5px; border-radius:2px;";
         document.body.appendChild(this._nameLabel);
 
-        this._loadingPlaceholder = document.createElement("div");
-        this._loadingPlaceholder.className = "loading-placeholder";
-        this._loadingPlaceholder.style = "position:absolute; top:50%; left:0px; color:white; font-size:1.5em;\
-            width:100%; height:50px; text-align:center;";
-        this._loadingPlaceholder.innerHTML = "Loading..."
-        document.body.appendChild(this._loadingPlaceholder);
-        this._setLoaderVisibility(false);
+        this._waiterWidget = new WaiterWidget("Loading...", document.body);
+        this._setWaiterVisibility(false);
 
         this._portals = new Array();
         this._hoveredPortal = NaN;
@@ -53,6 +49,18 @@ class Scene {
         this._zoomSpeed = zoomSpeed;
     }
 
+    setLang(lang) {
+        switch (lang) {
+            case "ru":
+                this._waiterWidget.setText("Загрузка...");
+                break;
+
+            default:
+                this._waiterWidget.setText("Loading...");
+                break;
+        }
+    }
+
     init(data) {
         this._clear();
         this._data = data;
@@ -63,7 +71,7 @@ class Scene {
             (err) => {this._onTextureLoadError(err);});
 
         this._nameLabel.innerHTML = this._data.title;
-        this._setLoaderVisibility(true);
+        this._setWaiterVisibility(true);
     }
 
     resize(width, height) {
@@ -119,12 +127,12 @@ class Scene {
     }
 
     _onTextureLoaded(_texture) {
-        this._setLoaderVisibility(false);
+        this._setWaiterVisibility(false);
     }
 
     _onTextureLoadError(err) {
         console.log(err);
-        this._setLoaderVisibility(false);
+        this._setWaiterVisibility(false);
     }
 
     _createTransitionPortals() {
@@ -172,9 +180,14 @@ class Scene {
         }
     }
 
-    _setLoaderVisibility(visible) {
-        this._loadingPlaceholder.style.visibility = visible ? "visible" : "hidden";
-        this._nameLabel.style.visibility = visible ? "hidden" : "visible";
+    _setWaiterVisibility(visible) {
+        if (visible) {
+            this._waiterWidget.show();
+            this._nameLabel.style.visibility = "hidden";
+        } else {
+            this._waiterWidget.hide();
+            this._nameLabel.style.visibility = "visible";
+        }
     }
 
     _clear() {
