@@ -1,11 +1,14 @@
 const SceneObjectStateEnum = require("./SceneObjectStateEnum.js");
+const SceneObjectEnum = require("./SceneObjectEnum.js");
 const WaiterWidget = require("./WaiterWidget.js");
+const PhotoWidget = require("./PhotoWidget.js");
 
 class Scene {
     constructor() {
         this._zoomMin = 1.0;
         this._zoomMax = 3.0;
         this._zoomSpeed = 0.02;
+        this._sceneRadius = 0;
 
         this._textureLoader = new THREE.TextureLoader();
         this._scene = new THREE.Scene();
@@ -29,18 +32,25 @@ class Scene {
         this._waiterWidget = new WaiterWidget("Loading...", document.body);
         this._setWaiterVisibility(false);
 
-        this._portals = new Array();
-        this._hoveredPortal = NaN;
-        this._portalTexture = {};
-        this._portalTexture[SceneObjectStateEnum.Normal] = "";
-        this._portalTexture[SceneObjectStateEnum.Hovered] = "";
+        this._photoWidget = new PhotoWidget(document.body);
+        this._setPhotoVisibility(false);
+
+        this._sceneObjects = new Array();
+        this._hoveredSceneObject = NaN;
+
+        this._sceneObjectTextures = {};
+        this._sceneObjectTextures[SceneObjectEnum.Portal] = {};
+        this._sceneObjectTextures[SceneObjectEnum.Portal][SceneObjectStateEnum.Normal] = "";
+        this._sceneObjectTextures[SceneObjectEnum.Portal][SceneObjectStateEnum.Hovered] = "";
+        this._sceneObjectTextures[SceneObjectEnum.Photo] = {};
+        this._sceneObjectTextures[SceneObjectEnum.Photo][SceneObjectStateEnum.Normal] = "";
+        this._sceneObjectTextures[SceneObjectEnum.Photo][SceneObjectStateEnum.Hovered] = "";
 
         Object.assign( Scene.prototype, THREE.EventDispatcher.prototype );
     }
 
-    setPortalTexture(portalNormalTexture, portalHoveredTexture) {
-        this._portalTexture[SceneObjectStateEnum.Normal] = portalNormalTexture;
-        this._portalTexture[SceneObjectStateEnum.Hovered] = portalHoveredTexture;
+    setSceneObjectTexture(sceneObjectEnum, sceneObjectState, texture) {
+        this._sceneObjectTextures[sceneObjectEnum][sceneObjectState] = texture;
     }
 
     setZoom(zoomMin, zoomMax, zoomSpeed) {
@@ -87,6 +97,10 @@ class Scene {
     }
 
     mouseMove(event) {
+        if (this._photoWidget.isVisible()) {
+            return;
+        }
+
         let sceneSize = new THREE.Vector2( 0, 0 );
         this._renderer.getSize(sceneSize);
 
@@ -94,23 +108,39 @@ class Scene {
         this._mouse.y = - ( event.clientY / sceneSize.height ) * 2 + 1; 
 
         this._raycaster.setFromCamera( this._mouse, this._camera );
-        const intersectedObjects = this._raycaster.intersectObjects(this._portals);
+        const intersectedObjects = this._raycaster.intersectObjects(this._sceneObjects);
 
         if (intersectedObjects.length > 0) {
-            this._hoveredPortal = intersectedObjects[0].object;
-            this._setPortalState(this._hoveredPortal, SceneObjectStateEnum.Hovered);
-        } else if (this._hoveredPortal) {
-            this._setPortalState(this._hoveredPortal, SceneObjectStateEnum.Normal);
-            this._hoveredPortal = NaN;
+            this._setSceneObjectState(intersectedObjects[0].object, SceneObjectStateEnum.Hovered);
+        } else if (this._hoveredSceneObject) {
+            this._setSceneObjectState(this._hoveredSceneObject, SceneObjectStateEnum.Normal);
         }
     }
 
     mouseClick(_event) {
-        if (!this._hoveredPortal) {
+        if (!this._hoveredSceneObject) {
+            if (this._photoWidget.isVisible()) {
+                this._setPhotoVisibility(false);
+            }
             return;
         }
 
-        this.dispatchEvent( { type: "portalclicked", uid: this._hoveredPortal.userData.uid } );
+        switch (this._hoveredSceneObject.userData.type) {
+            case SceneObjectEnum.Portal:
+                const uid = this._hoveredSceneObject.userData.data.toUid;
+                this.dispatchEvent( { type: "portalclicked", uid: uid } );
+                break;
+
+            case SceneObjectEnum.Photo:
+                const photoPath = this._hoveredSceneObject.userData.data.image;
+                this._photoWidget.setPhoto(photoPath);
+                this._setPhotoVisibility(true);
+                this._setSceneObjectState(this._hoveredSceneObject, SceneObjectStateEnum.Normal);
+                break;
+
+            default:
+                break;
+        }
     }
 
     mouseWheel(event) {
@@ -135,49 +165,54 @@ class Scene {
         this._setWaiterVisibility(false);
     }
 
-    _createTransitionPortals() {
-        this._portals = [];
+    _createSceneObjects() {
+        this._sceneObjects = [];
 
         for (let i = 0; i < this._data.transitions.length; i++) {
             const transition = this._data.transitions[i];
-            const portalGeometry = new THREE.PlaneGeometry(32, 32);
-            const portalMaterial = new THREE.MeshBasicMaterial(
-                { color: 0xff0000, transparent: true, side: THREE.DoubleSide }
-            );
+            let mesh = this._createSceneObjectMesh(0xff0000, transition.point.height, transition.point.radius);
+            mesh.userData = {type: SceneObjectEnum.Portal, data: transition};
+            this._setSceneObjectState(mesh, SceneObjectStateEnum.Normal);
+            this._addSceneObject(mesh, transition.point.angle);
+        }
 
-            let portalMesh = new THREE.Mesh( portalGeometry, portalMaterial);
-            portalMesh.position.set(0, 0, -this._cylinderRadius * transition.point.radius);
-            portalMesh.userData = {uid: transition.toUid};
-            this._setPortalState(portalMesh, SceneObjectStateEnum.Normal);
-
-            let pivot = new THREE.Group();
-            this._scene.add( pivot );
-            pivot.add( portalMesh );
-            pivot.rotateOnAxis(new THREE.Vector3(0, 1, 0), transition.point.angle);
-
-            this._portals.push(portalMesh);
+        for (let i = 0; i < this._data.photos.length; i++) {
+            const photo = this._data.photos[i];
+            let mesh = this._createSceneObjectMesh(0x0000ff, photo.point.height, photo.point.radius);
+            mesh.userData = {type: SceneObjectEnum.Photo, data: photo};
+            this._setSceneObjectState(mesh, SceneObjectStateEnum.Normal);
+            this._addSceneObject(mesh, photo.point.angle);
         }
     }
 
-    _setPortalState(portalMesh, state) {
-        switch(state) {
-            case SceneObjectStateEnum.Hovered:
-                document.body.style.cursor = "pointer";
-                this._textureLoader.load(this._portalTexture[SceneObjectStateEnum.Hovered], 
-                                        (texture) => {
-                                            portalMesh.material.map = texture;
-                                            portalMesh.material.color = NaN;
-                                        });
-                break;
+    _createSceneObjectMesh(color, spotHeight, spotRadius) {
+        const geometry = new THREE.PlaneGeometry(32, 32);
+        const material = new THREE.MeshBasicMaterial(
+            { color: color, transparent: true, side: THREE.DoubleSide }
+        );
 
-            default:
-                document.body.style.cursor = "auto";
-                this._textureLoader.load(this._portalTexture[SceneObjectStateEnum.Normal], 
-                                        (texture) => {
-                                            portalMesh.material.map = texture;
-                                            portalMesh.material.color = NaN;
-                                        });
-        }
+        let mesh = new THREE.Mesh( geometry, material);
+        mesh.position.set(0, spotHeight, -this._sceneRadius * spotRadius);
+        return mesh;
+    }
+
+    _addSceneObject(mesh, angle) {
+        let pivot = new THREE.Group();
+        this._scene.add( pivot );
+        pivot.add( mesh );
+        pivot.rotateOnAxis(new THREE.Vector3(0, 1, 0), angle);
+        this._sceneObjects.push(mesh);
+    }
+
+    _setSceneObjectState(mesh, state) {
+        document.body.style.cursor = (state == SceneObjectStateEnum.Hovered) ? "pointer" : "auto";
+        this._hoveredSceneObject = (state == SceneObjectStateEnum.Hovered) ? mesh : NaN;
+        const textureName = this._sceneObjectTextures[mesh.userData.type][state];
+        this._textureLoader.load(textureName, (texture) => {
+            mesh.material.map = texture;
+            mesh.material.color = NaN;
+            mesh.material.needsUpdate = true;
+        });
     }
 
     _setWaiterVisibility(visible) {
@@ -190,6 +225,16 @@ class Scene {
         }
     }
 
+    _setPhotoVisibility(visible) {
+        if (visible) {
+            this._photoWidget.show();
+            this._nameLabel.style.visibility = "hidden";
+        } else {
+            this._photoWidget.hide();
+            this._nameLabel.style.visibility = "visible";
+        }
+    }
+
     _clear() {
         while(this._scene.children.length > 0){
             this._scene.remove(this._scene.children[0]);
@@ -198,7 +243,7 @@ class Scene {
         this._camera.zoom = 1.0;
         this._cylinder = NaN;
         this._data = NaN;
-        this._cylinderRadius = 0;
+        this._sceneRadius = 0;
     }
 }
 

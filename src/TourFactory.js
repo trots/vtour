@@ -4,6 +4,7 @@ class TourFactory {
     static start(tourData) {
         var tour = new Tour(tourData.type);
         tour.setPortalTexture(tourData.normalPortalImage, tourData.hoveredPortalImage);
+        tour.setPhotoTexture(tourData.normalPhotoImage, tourData.hoveredPhotoImage);
         tour.setZoom(tourData.zoomMin, tourData.zoomMax, tourData.zoomSpeed);
         tour.setLang(tourData.lang);
 

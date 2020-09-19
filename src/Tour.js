@@ -1,3 +1,5 @@
+const SceneObjectStateEnum = require("./SceneObjectStateEnum.js");
+const SceneObjectEnum = require("./SceneObjectEnum.js");
 const CylindricalScene = require("./CylindricalScene.js");
 
 class Tour {
@@ -9,7 +11,13 @@ class Tour {
     }
 
     setPortalTexture(normalStateImage, hoveredStateImage) {
-        this._scene.setPortalTexture(normalStateImage, hoveredStateImage);
+        this._scene.setSceneObjectTexture(SceneObjectEnum.Portal, SceneObjectStateEnum.Normal, normalStateImage);
+        this._scene.setSceneObjectTexture(SceneObjectEnum.Portal, SceneObjectStateEnum.Hovered, hoveredStateImage);
+    }
+
+    setPhotoTexture(normalStateImage, hoveredStateImage) {
+        this._scene.setSceneObjectTexture(SceneObjectEnum.Photo, SceneObjectStateEnum.Normal, normalStateImage);
+        this._scene.setSceneObjectTexture(SceneObjectEnum.Photo, SceneObjectStateEnum.Hovered, hoveredStateImage);
     }
 
     setZoom(zoomMin, zoomMax, zoomSpeed) {
