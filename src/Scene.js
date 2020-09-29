@@ -2,6 +2,7 @@ const SceneObjectStateEnum = require("./SceneObjectStateEnum.js");
 const SceneObjectEnum = require("./SceneObjectEnum.js");
 const WaiterWidget = require("./WaiterWidget.js");
 const PhotoWidget = require("./PhotoWidget.js");
+const FullscreenButton = require("./FullscreenButton.js")
 
 class Scene {
     constructor() {
@@ -26,8 +27,10 @@ class Scene {
         this._nameLabel = document.createElement("div");
         this._nameLabel.className = "scene-name";
         this._nameLabel.style = "position:absolute; top:5px; left:5px; color:white; font-size:1.5em;\
-            background-color:#a6a6a687; padding:5px; border-radius:2px;";
+            background-color:#a6a6a687; padding:5px; border-radius:5px;";
         document.body.appendChild(this._nameLabel);
+
+        this._fullscreenButton = new FullscreenButton(document.body);
 
         this._waiterWidget = new WaiterWidget("Loading...", document.body);
         this._setWaiterVisibility(false);
@@ -219,9 +222,11 @@ class Scene {
         if (visible) {
             this._waiterWidget.show();
             this._nameLabel.style.visibility = "hidden";
+            this._fullscreenButton.hide();
         } else {
             this._waiterWidget.hide();
             this._nameLabel.style.visibility = "visible";
+            this._fullscreenButton.show();
         }
     }
 
@@ -229,9 +234,11 @@ class Scene {
         if (visible) {
             this._photoWidget.show();
             this._nameLabel.style.visibility = "hidden";
+            this._fullscreenButton.hide();
         } else {
             this._photoWidget.hide();
             this._nameLabel.style.visibility = "visible";
+            this._fullscreenButton.show();
         }
     }
 
