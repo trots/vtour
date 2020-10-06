@@ -5,7 +5,8 @@ const PhotoWidget = require("./PhotoWidget.js");
 const FullscreenButton = require("./FullscreenButton.js")
 
 class Scene {
-    constructor() {
+    constructor(parentElement) {
+        this._parentElement = parentElement;
         this._zoomMin = 1.0;
         this._zoomMax = 3.0;
         this._zoomSpeed = 0.02;
@@ -16,26 +17,25 @@ class Scene {
         this._camera = new THREE.PerspectiveCamera();
 
         this._renderer = new THREE.WebGLRenderer();
-        document.body.appendChild( this._renderer.domElement );
+        this._parentElement.appendChild( this._renderer.domElement );
 
         this._controls = new THREE.OrbitControls(this._camera, this._renderer.domElement);
         this._controls.enableZoom = false;
 
         this._raycaster = new THREE.Raycaster(); 
-        this._mouse = new THREE.Vector2();
 
         this._nameLabel = document.createElement("div");
         this._nameLabel.className = "scene-name";
         this._nameLabel.style = "position:absolute; top:5px; left:5px; color:white; font-size:1.5em;\
             background-color:#a6a6a687; padding:5px; border-radius:5px;";
-        document.body.appendChild(this._nameLabel);
+        this._parentElement.appendChild(this._nameLabel);
 
-        this._fullscreenButton = new FullscreenButton(document.body);
+        this._fullscreenButton = new FullscreenButton(this._parentElement);
 
-        this._waiterWidget = new WaiterWidget("Loading...", document.body);
+        this._waiterWidget = new WaiterWidget("Loading...", this._parentElement);
         this._setWaiterVisibility(false);
 
-        this._photoWidget = new PhotoWidget(document.body);
+        this._photoWidget = new PhotoWidget(this._parentElement);
         this._setPhotoVisibility(false);
 
         this._sceneObjects = new Array();
@@ -99,28 +99,17 @@ class Scene {
         this._renderer.render( this._scene, this._camera );
     }
 
-    mouseMove(event) {
+    hover(x, y) {
         if (this._photoWidget.isVisible()) {
             return;
         }
 
-        let sceneSize = new THREE.Vector2( 0, 0 );
-        this._renderer.getSize(sceneSize);
-
-        this._mouse.x = ( event.clientX / sceneSize.width ) * 2 - 1; 
-        this._mouse.y = - ( event.clientY / sceneSize.height ) * 2 + 1; 
-
-        this._raycaster.setFromCamera( this._mouse, this._camera );
-        const intersectedObjects = this._raycaster.intersectObjects(this._sceneObjects);
-
-        if (intersectedObjects.length > 0) {
-            this._setSceneObjectState(intersectedObjects[0].object, SceneObjectStateEnum.Hovered);
-        } else if (this._hoveredSceneObject) {
-            this._setSceneObjectState(this._hoveredSceneObject, SceneObjectStateEnum.Normal);
-        }
+        this._hoverObject(x, y);
     }
 
-    mouseClick(_event) {
+    click(x, y) {
+        this._hoverObject(x, y);
+
         if (!this._hoveredSceneObject) {
             if (this._photoWidget.isVisible()) {
                 this._setPhotoVisibility(false);
@@ -157,6 +146,24 @@ class Scene {
         }
 
         this._camera.updateProjectionMatrix();
+    }
+
+    _hoverObject(x, y) {
+        let sceneSize = new THREE.Vector2( 0, 0 );
+        this._renderer.getSize(sceneSize);
+
+        let cursor = new THREE.Vector2();
+        cursor.x = ( x / sceneSize.width ) * 2 - 1; 
+        cursor.y = - ( y / sceneSize.height ) * 2 + 1; 
+
+        this._raycaster.setFromCamera( cursor, this._camera );
+        const intersectedObjects = this._raycaster.intersectObjects(this._sceneObjects);
+
+        if (intersectedObjects.length > 0) {
+            this._setSceneObjectState(intersectedObjects[0].object, SceneObjectStateEnum.Hovered);
+        } else if (this._hoveredSceneObject) {
+            this._setSceneObjectState(this._hoveredSceneObject, SceneObjectStateEnum.Normal);
+        }
     }
 
     _onTextureLoaded(_texture) {
@@ -208,7 +215,7 @@ class Scene {
     }
 
     _setSceneObjectState(mesh, state) {
-        document.body.style.cursor = (state == SceneObjectStateEnum.Hovered) ? "pointer" : "auto";
+        this._parentElement.style.cursor = (state == SceneObjectStateEnum.Hovered) ? "pointer" : "auto";
         this._hoveredSceneObject = (state == SceneObjectStateEnum.Hovered) ? mesh : NaN;
         const textureName = this._sceneObjectTextures[mesh.userData.type][state];
         this._textureLoader.load(textureName, (texture) => {

@@ -1,8 +1,8 @@
 const Tour = require("./Tour.js");
 
 class TourFactory {
-    static start(tourData) {
-        var tour = new Tour(tourData.type);
+    static start(parentElement, tourData) {
+        var tour = new Tour(parentElement, tourData.type);
         tour.setPortalTexture(tourData.normalPortalImage, tourData.hoveredPortalImage);
         tour.setPhotoTexture(tourData.normalPhotoImage, tourData.hoveredPhotoImage);
         tour.setZoom(tourData.zoomMin, tourData.zoomMax, tourData.zoomSpeed);

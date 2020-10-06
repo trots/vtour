@@ -7,6 +7,7 @@ class FullscreenButton {
         parentElement.appendChild(this._element);
 
         this._element.addEventListener("click", (event) => { this._onClicked(event); });
+        this._element.addEventListener("touchend", (event) => { this._onClicked(event); });
     }
 
     show() {
@@ -25,6 +26,7 @@ class FullscreenButton {
         }
 
         event.stopPropagation();
+        event.preventDefault();
     }
 }
 

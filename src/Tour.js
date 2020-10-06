@@ -3,11 +3,19 @@ const SceneObjectEnum = require("./SceneObjectEnum.js");
 const CylindricalScene = require("./CylindricalScene.js");
 
 class Tour {
-    constructor(_type) {
-        this._scene = new CylindricalScene();
+    constructor(parentElement, _type) {
+        this._parentElement = parentElement;
+        this._scene = new CylindricalScene(this._parentElement);
         this._sceneDataMap = new Map();
 
+        window.addEventListener("resize", (event) => {this._onResize(event);});
+        this._parentElement.addEventListener("mousemove", (event) => {this._onMouseMove(event);});
+        this._parentElement.addEventListener("click", (event) => {this._onClick(event);});
+        this._parentElement.addEventListener("wheel", (event) => {this._onMouseWheel(event);});
+        this._parentElement.addEventListener("touchend", (event) => {this._onTouchEnd(event);});
         this._scene.addEventListener("portalclicked", (event) => {this._onTransitionActivated(event);} );
+
+        this._scene.resize(this._parentElement.offsetWidth, this._parentElement.offsetHeight);
     }
 
     setPortalTexture(normalStateImage, hoveredStateImage) {
@@ -41,20 +49,26 @@ class Tour {
         this._scene.init(data);
     }
 
-    resize(width, height) {
-        this._scene.resize(width, height);
+    _onResize(_event) {
+        this._scene.resize(this._parentElement.offsetWidth, this._parentElement.offsetHeight);
     }
 
-    mouseMove(event) {
-        this._scene.mouseMove(event);
+    _onMouseMove(event) {
+        this._scene.hover(event.clientX, event.clientY);
     }
 
-    mouseClick(event) {
-        this._scene.mouseClick(event);
+    _onClick(event) {
+        this._scene.click(event.clientX, event.clientY);
+        event.stopPropagation();
     }
 
-    mouseWheel(event) {
+    _onMouseWheel(event) {
         this._scene.mouseWheel(event);
+    }
+
+    _onTouchEnd(event) {
+        this._scene.click(event.changedTouches[0].clientX, event.changedTouches[0].clientY);
+        event.preventDefault();
     }
 
     _onTransitionActivated(event) {

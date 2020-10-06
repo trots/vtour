@@ -1,8 +1,8 @@
 const Scene = require("./Scene.js");
 
 class CylindricalScene extends Scene {
-    constructor() {
-        super();
+    constructor(parentElement) {
+        super(parentElement);
 
         this._controls.maxPolarAngle = Math.PI/2;
         this._controls.minPolarAngle = Math.PI/2;
