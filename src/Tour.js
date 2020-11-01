@@ -5,14 +5,18 @@ const CylindricalScene = require("./CylindricalScene.js");
 class Tour {
     constructor(parentElement, _type) {
         this._parentElement = parentElement;
-        this._scene = new CylindricalScene(this._parentElement);
-        this._sceneDataMap = new Map();
+        this._touchDistance = 0.0;
 
         window.addEventListener("resize", (event) => {this._onResize(event);});
         this._parentElement.addEventListener("mousemove", (event) => {this._onMouseMove(event);});
         this._parentElement.addEventListener("click", (event) => {this._onClick(event);});
         this._parentElement.addEventListener("wheel", (event) => {this._onMouseWheel(event);});
+        this._parentElement.addEventListener("touchstart", (event) => {this._onTouchStart(event);});
+        this._parentElement.addEventListener("touchmove", (event) => {this._onTouchMove(event);});
         this._parentElement.addEventListener("touchend", (event) => {this._onTouchEnd(event);});
+
+        this._sceneDataMap = new Map();
+        this._scene = new CylindricalScene(this._parentElement);
         this._scene.addEventListener("portalclicked", (event) => {this._onTransitionActivated(event);} );
 
         this._scene.resize(this._parentElement.offsetWidth, this._parentElement.offsetHeight);
@@ -63,12 +67,35 @@ class Tour {
     }
 
     _onMouseWheel(event) {
-        this._scene.mouseWheel(event);
+        event.preventDefault();
+        const zoomStep = 3;
+        this._scene.zoom(event.deltaY > 0 ? zoomStep : -zoomStep);
+    }
+
+    _onTouchStart(event) {
+        if (event.touches.length == 2) {
+            this._touchDistance = this._getTouchDistance(event);
+        }
+    }
+
+    _onTouchMove(event) {
+        if (event.touches.length == 2) {
+            event.preventDefault(); // prevent scrolling
+            event.stopPropagation();
+            const touchDistance = this._getTouchDistance(event);
+            const delta = this._touchDistance - touchDistance;
+            this._scene.zoom(delta > 0 ? 1 : -1);
+            this._touchDistance = touchDistance;
+        }
     }
 
     _onTouchEnd(event) {
-        this._scene.click(event.changedTouches[0].clientX, event.changedTouches[0].clientY);
-        event.preventDefault();
+        if (event.touches.length == 2) {
+            this._touchDistance = 0.0;
+        } else {
+            this._scene.click(event.changedTouches[0].clientX, event.changedTouches[0].clientY);
+            event.preventDefault();
+        }
     }
 
     _onTransitionActivated(event) {
@@ -78,6 +105,11 @@ class Tour {
 
         const data = this._sceneDataMap.get(event.uid);
         this._scene.init(data);
+    }
+
+    _getTouchDistance(event) {
+        return Math.hypot(event.touches[0].clientX - event.touches[1].clientX,
+                          event.touches[0].clientY - event.touches[1].clientY);
     }
 }
 

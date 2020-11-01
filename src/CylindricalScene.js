@@ -11,8 +11,8 @@ class CylindricalScene extends Scene {
         this._data = NaN;
     }
 
-    mouseWheel(event) {
-        super.mouseWheel(event);
+    zoom(deltaY) {
+        super.zoom(deltaY);
         const viewAngleDiff = (this._camera.fov - this._camera.getEffectiveFOV()) * (Math.PI / 180);
         this._controls.maxPolarAngle = Math.PI / 2 + viewAngleDiff / 2;
         this._controls.minPolarAngle = Math.PI / 2 - viewAngleDiff / 2;

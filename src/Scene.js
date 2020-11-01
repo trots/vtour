@@ -19,8 +19,9 @@ class Scene {
         this._renderer = new THREE.WebGLRenderer();
         this._parentElement.appendChild( this._renderer.domElement );
 
-        this._controls = new THREE.OrbitControls(this._camera, this._renderer.domElement);
+        this._controls = new THREE.OrbitControls(this._camera, this._parentElement);
         this._controls.enableZoom = false;
+        this._controls.enablePan = false;
 
         this._raycaster = new THREE.Raycaster(); 
 
@@ -135,9 +136,8 @@ class Scene {
         }
     }
 
-    mouseWheel(event) {
-        event.preventDefault();
-        this._camera.zoom += event.deltaY * -this._zoomSpeed;
+    zoom(delta) {
+        this._camera.zoom += delta * -this._zoomSpeed;
 
         if (this._camera.zoom < this._zoomMin) {
             this._camera.zoom = this._zoomMin;
@@ -149,7 +149,7 @@ class Scene {
     }
 
     _hoverObject(x, y) {
-        let sceneSize = new THREE.Vector2( 0, 0 );
+        const sceneSize = new THREE.Vector2( 0, 0 );
         this._renderer.getSize(sceneSize);
 
         let cursor = new THREE.Vector2();
