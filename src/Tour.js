@@ -79,12 +79,20 @@ class Tour {
     }
 
     _onTouchMove(event) {
+        const ZoomStep = 2;
+        const TouchDeltaSensitivity = 2;
+
         if (event.touches.length == 2) {
-            event.preventDefault(); // prevent scrolling
+            event.preventDefault(); // to prevent scrolling
             event.stopPropagation();
             const touchDistance = this._getTouchDistance(event);
             const delta = this._touchDistance - touchDistance;
-            this._scene.zoom(delta > 0 ? 1 : -1);
+
+            if (Math.abs(delta) < TouchDeltaSensitivity) {
+                return; // to prevent scene vibrations
+            }
+
+            this._scene.zoom(delta > 0 ? ZoomStep : -ZoomStep);
             this._touchDistance = touchDistance;
         }
     }
