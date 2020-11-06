@@ -1,3 +1,4 @@
+const Defines = require("./Defines.js");
 const SceneObjectStateEnum = require("./SceneObjectStateEnum.js");
 const SceneObjectEnum = require("./SceneObjectEnum.js");
 const WaiterWidget = require("./WaiterWidget.js");
@@ -28,8 +29,16 @@ class Scene {
         this._nameLabel = document.createElement("div");
         this._nameLabel.className = "scene-name";
         this._nameLabel.style = "position:absolute; top:5px; left:5px; color:white; font-size:1.5em;\
-            background-color:#a6a6a687; padding:5px; border-radius:5px;";
+            background-color:#a6a6a687; padding:5px; border-radius:5px; cursor:default;";
         this._parentElement.appendChild(this._nameLabel);
+
+        this._versionLabel = document.createElement("div");
+        this._versionLabel.className = "version-label";
+        this._versionLabel.style = "position:absolute; bottom:5px; right:5px; color:white; font-size:1em;\
+            cursor:default;";
+        this._versionLabel.innerHTML = "vtour " + Defines.VersionMajor + "." + Defines.VersionMinor 
+                                       + "." + Defines.VersionPatch;
+        this._parentElement.appendChild(this._versionLabel);
 
         this._fullscreenButton = new FullscreenButton(this._parentElement);
 
@@ -229,10 +238,12 @@ class Scene {
         if (visible) {
             this._waiterWidget.show();
             this._nameLabel.style.visibility = "hidden";
+            this._versionLabel.style.visibility = "hidden";
             this._fullscreenButton.hide();
         } else {
             this._waiterWidget.hide();
             this._nameLabel.style.visibility = "visible";
+            this._versionLabel.style.visibility = "visible";
             this._fullscreenButton.show();
         }
     }
@@ -241,10 +252,12 @@ class Scene {
         if (visible) {
             this._photoWidget.show();
             this._nameLabel.style.visibility = "hidden";
+            this._versionLabel.style.visibility = "hidden";
             this._fullscreenButton.hide();
         } else {
             this._photoWidget.hide();
             this._nameLabel.style.visibility = "visible";
+            this._versionLabel.style.visibility = "visible";
             this._fullscreenButton.show();
         }
     }
