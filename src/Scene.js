@@ -1,4 +1,5 @@
 const Defines = require("./Defines.js");
+const I18n = require("./I18n.js");
 const SceneObjectStateEnum = require("./SceneObjectStateEnum.js");
 const SceneObjectEnum = require("./SceneObjectEnum.js");
 const WaiterWidget = require("./WaiterWidget.js");
@@ -27,12 +28,14 @@ class Scene {
         this._raycaster = new THREE.Raycaster(); 
 
         this._nameLabel = document.createElement("div");
+        this._nameLabel.title = I18n.Dict.SceneTooltip;
         this._nameLabel.className = "scene-name";
         this._nameLabel.style = "position:absolute; top:5px; left:5px; color:white; font-size:1.5em;\
             background-color:#a6a6a687; padding:5px; border-radius:5px; cursor:default;";
         this._parentElement.appendChild(this._nameLabel);
 
         this._versionLabel = document.createElement("div");
+        this._versionLabel.title = I18n.Dict.VersionLabelTooltip;
         this._versionLabel.className = "version-label";
         this._versionLabel.style = "position:absolute; bottom:5px; right:5px; color:white; font-size:1em;\
             cursor:default;";
@@ -42,7 +45,7 @@ class Scene {
 
         this._fullscreenButton = new FullscreenButton(this._parentElement);
 
-        this._waiterWidget = new WaiterWidget("Loading...", this._parentElement);
+        this._waiterWidget = new WaiterWidget(I18n.Dict.Loading, this._parentElement);
         this._setWaiterVisibility(false);
 
         this._photoWidget = new PhotoWidget(this._parentElement);
@@ -70,18 +73,6 @@ class Scene {
         this._zoomMin = zoomMin;
         this._zoomMax = zoomMax;
         this._zoomSpeed = zoomSpeed;
-    }
-
-    setLang(lang) {
-        switch (lang) {
-            case "ru":
-                this._waiterWidget.setText("Загрузка...");
-                break;
-
-            default:
-                this._waiterWidget.setText("Loading...");
-                break;
-        }
     }
 
     init(data) {
@@ -190,7 +181,7 @@ class Scene {
         for (let i = 0; i < this._data.transitions.length; i++) {
             const transition = this._data.transitions[i];
             let mesh = this._createSceneObjectMesh(0xff0000, transition.point.height, transition.point.radius);
-            mesh.userData = {type: SceneObjectEnum.Portal, data: transition};
+            mesh.userData = {type: SceneObjectEnum.Portal, data: transition, tooltip: I18n.Dict.PortalTooltip};
             this._setSceneObjectState(mesh, SceneObjectStateEnum.Normal);
             this._addSceneObject(mesh, transition.point.angle);
         }
@@ -198,7 +189,7 @@ class Scene {
         for (let i = 0; i < this._data.photos.length; i++) {
             const photo = this._data.photos[i];
             let mesh = this._createSceneObjectMesh(0x0000ff, photo.point.height, photo.point.radius);
-            mesh.userData = {type: SceneObjectEnum.Photo, data: photo};
+            mesh.userData = {type: SceneObjectEnum.Photo, data: photo, tooltip: I18n.Dict.PhotospotTooltip};
             this._setSceneObjectState(mesh, SceneObjectStateEnum.Normal);
             this._addSceneObject(mesh, photo.point.angle);
         }
@@ -225,6 +216,7 @@ class Scene {
 
     _setSceneObjectState(mesh, state) {
         this._parentElement.style.cursor = (state == SceneObjectStateEnum.Hovered) ? "pointer" : "auto";
+        this._parentElement.title = (state == SceneObjectStateEnum.Hovered) ? mesh.userData.tooltip : ""; 
         this._hoveredSceneObject = (state == SceneObjectStateEnum.Hovered) ? mesh : NaN;
         const textureName = this._sceneObjectTextures[mesh.userData.type][state];
         this._textureLoader.load(textureName, (texture) => {

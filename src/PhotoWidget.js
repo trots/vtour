@@ -1,3 +1,5 @@
+const I18n = require("./I18n.js");
+
 class PhotoWidget {
     constructor(parentElement) {
         this._element = document.createElement("div");
@@ -11,6 +13,7 @@ class PhotoWidget {
         this._element.appendChild(this._imageElement);
 
         this._closeElement = document.createElement("div");
+        this._closeElement.title = I18n.Dict.Close;
         this._closeElement.className = "photo-close-item";
         this._closeElement.style = "position:absolute; top:5px; right:10px; color:white; font:20px Arial;\
             cursor:pointer;";
