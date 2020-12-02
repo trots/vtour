@@ -4,9 +4,7 @@ class FullscreenButton {
     constructor(parentElement) {
         this._element = document.createElement("div");
         this._element.title = I18n.Dict.FullscreenTooltip;
-        this._element.className = "fullscreen-button";
-        this._element.style = "position:absolute; top:5px; right:5px; background-color:#a6a6a687;\
-            width:32px; height:24px; border:2px solid white; border-radius:5px; cursor:pointer;";
+        this._element.className = "vt-fullscreen-button";
         parentElement.appendChild(this._element);
 
         this._element.addEventListener("click", (event) => { this._onClicked(event); });

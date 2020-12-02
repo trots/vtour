@@ -30,16 +30,12 @@ class Scene {
 
         this._nameLabel = document.createElement("div");
         this._nameLabel.title = I18n.Dict.SceneTooltip;
-        this._nameLabel.className = "scene-name";
-        this._nameLabel.style = "position:absolute; top:5px; left:5px; color:white; font-size:1.5em;\
-            background-color:#a6a6a687; padding:5px; border-radius:5px; cursor:default;";
+        this._nameLabel.className = "vt-scene-name-label";
         this._parentElement.appendChild(this._nameLabel);
 
         this._versionLabel = document.createElement("div");
         this._versionLabel.title = I18n.Dict.VersionLabelTooltip;
-        this._versionLabel.className = "version-label";
-        this._versionLabel.style = "position:absolute; bottom:5px; right:5px; color:white; font-size:1em;\
-            cursor:default;";
+        this._versionLabel.className = "vt-version-label";
         this._versionLabel.innerHTML = "vtour " + Defines.VersionMajor + "." + Defines.VersionMinor 
                                        + "." + Defines.VersionPatch;
         this._parentElement.appendChild(this._versionLabel);
