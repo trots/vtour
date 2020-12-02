@@ -22,14 +22,8 @@ class Tour {
         this._scene.resize(this._parentElement.offsetWidth, this._parentElement.offsetHeight);
     }
 
-    setPortalTexture(normalStateImage, hoveredStateImage) {
-        this._scene.setSceneObjectTexture(SceneObjectEnum.Portal, SceneObjectStateEnum.Normal, normalStateImage);
-        this._scene.setSceneObjectTexture(SceneObjectEnum.Portal, SceneObjectStateEnum.Hovered, hoveredStateImage);
-    }
-
-    setPhotoTexture(normalStateImage, hoveredStateImage) {
-        this._scene.setSceneObjectTexture(SceneObjectEnum.Photo, SceneObjectStateEnum.Normal, normalStateImage);
-        this._scene.setSceneObjectTexture(SceneObjectEnum.Photo, SceneObjectStateEnum.Hovered, hoveredStateImage);
+    setAssetsPath(assetsPath) {
+        this._scene.setAssetsPath(assetsPath);
     }
 
     setZoom(zoomMin, zoomMax, zoomSpeed) {

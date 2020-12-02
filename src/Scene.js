@@ -9,6 +9,7 @@ const FullscreenButton = require("./FullscreenButton.js")
 class Scene {
     constructor(parentElement) {
         this._parentElement = parentElement;
+        this._assetsPath = "";
         this._zoomMin = 1.0;
         this._zoomMax = 3.0;
         this._zoomSpeed = 0.02;
@@ -54,19 +55,11 @@ class Scene {
         this._sceneObjects = new Array();
         this._hoveredSceneObject = NaN;
 
-        this._sceneObjectTextures = {};
-        this._sceneObjectTextures[SceneObjectEnum.Portal] = {};
-        this._sceneObjectTextures[SceneObjectEnum.Portal][SceneObjectStateEnum.Normal] = "";
-        this._sceneObjectTextures[SceneObjectEnum.Portal][SceneObjectStateEnum.Hovered] = "";
-        this._sceneObjectTextures[SceneObjectEnum.Photo] = {};
-        this._sceneObjectTextures[SceneObjectEnum.Photo][SceneObjectStateEnum.Normal] = "";
-        this._sceneObjectTextures[SceneObjectEnum.Photo][SceneObjectStateEnum.Hovered] = "";
-
         Object.assign( Scene.prototype, THREE.EventDispatcher.prototype );
     }
 
-    setSceneObjectTexture(sceneObjectEnum, sceneObjectState, texture) {
-        this._sceneObjectTextures[sceneObjectEnum][sceneObjectState] = texture;
+    setAssetsPath(assetsPath) {
+        this._assetsPath = assetsPath;
     }
 
     setZoom(zoomMin, zoomMax, zoomSpeed) {
@@ -182,6 +175,13 @@ class Scene {
             const transition = this._data.transitions[i];
             let mesh = this._createSceneObjectMesh(0xff0000, transition.point.height, transition.point.radius);
             mesh.userData = {type: SceneObjectEnum.Portal, data: transition, tooltip: I18n.Dict.PortalTooltip};
+
+            this._textureLoader.load(this._getAssetFilePath("portal.png"), (texture) => {
+                mesh.material.map = texture;
+                mesh.material.color = NaN;
+                mesh.material.needsUpdate = true;
+            });
+
             this._setSceneObjectState(mesh, SceneObjectStateEnum.Normal);
             this._addSceneObject(mesh, transition.point.angle);
         }
@@ -190,6 +190,13 @@ class Scene {
             const photo = this._data.photos[i];
             let mesh = this._createSceneObjectMesh(0x0000ff, photo.point.height, photo.point.radius);
             mesh.userData = {type: SceneObjectEnum.Photo, data: photo, tooltip: I18n.Dict.PhotospotTooltip};
+
+            this._textureLoader.load(this._getAssetFilePath("photospot.png"), (texture) => {
+                mesh.material.map = texture;
+                mesh.material.color = NaN;
+                mesh.material.needsUpdate = true;
+            });
+
             this._setSceneObjectState(mesh, SceneObjectStateEnum.Normal);
             this._addSceneObject(mesh, photo.point.angle);
         }
@@ -218,12 +225,6 @@ class Scene {
         this._parentElement.style.cursor = (state == SceneObjectStateEnum.Hovered) ? "pointer" : "auto";
         this._parentElement.title = (state == SceneObjectStateEnum.Hovered) ? mesh.userData.tooltip : ""; 
         this._hoveredSceneObject = (state == SceneObjectStateEnum.Hovered) ? mesh : NaN;
-        const textureName = this._sceneObjectTextures[mesh.userData.type][state];
-        this._textureLoader.load(textureName, (texture) => {
-            mesh.material.map = texture;
-            mesh.material.color = NaN;
-            mesh.material.needsUpdate = true;
-        });
     }
 
     _setWaiterVisibility(visible) {
@@ -263,6 +264,10 @@ class Scene {
         this._cylinder = NaN;
         this._data = NaN;
         this._sceneRadius = 0;
+    }
+
+    _getAssetFilePath(fileName) {
+        return this._assetsPath ? (this._assetsPath + "/" + fileName) : fileName;
     }
 }
 

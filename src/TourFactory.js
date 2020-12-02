@@ -6,8 +6,7 @@ class TourFactory {
         I18n.SetLang(tourData.lang);
 
         var tour = new Tour(parentElement, tourData.type);
-        tour.setPortalTexture(tourData.normalPortalImage, tourData.hoveredPortalImage);
-        tour.setPhotoTexture(tourData.normalPhotoImage, tourData.hoveredPhotoImage);
+        tour.setAssetsPath(tourData.assetsPath);
         tour.setZoom(tourData.zoomMin, tourData.zoomMax, tourData.zoomSpeed);
 
         for (let i = 0; i < tourData.scenes.length; i++) {
