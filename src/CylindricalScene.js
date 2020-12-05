@@ -18,6 +18,23 @@ class CylindricalScene extends Scene {
         this._controls.minPolarAngle = Math.PI / 2 - viewAngleDiff / 2;
     }
 
+    rotateX(angle) {
+        const currentAngle = this._controls.getPolarAngle();
+        let newAngle = currentAngle + angle;
+        newAngle = Math.max( this._controls.minPolarAngle, Math.min( this._controls.maxPolarAngle, newAngle ) );
+        const diff = newAngle - currentAngle;
+
+        if (diff == 0) {
+            return;
+        }
+
+        const rotationVec = this._getCameraXAxis();
+        let quaternion = new THREE.Quaternion;
+        quaternion.setFromAxisAngle(rotationVec, diff);
+        this._camera.position.applyQuaternion(quaternion);
+        this._camera.up.applyQuaternion(quaternion);
+    }
+
     _onTextureLoaded(texture) {
         this._sceneRadius = texture.image.width / (2 * Math.PI);
         const cylinderHeight = texture.image.height;

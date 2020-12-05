@@ -18,6 +18,9 @@ class Scene {
         this._textureLoader = new THREE.TextureLoader();
         this._scene = new THREE.Scene();
         this._camera = new THREE.PerspectiveCamera();
+        this._camera_init_position = this._camera.position.clone();
+        this._camera_init_up = this._camera.up.clone();
+        this._camera_init_zoom = this._camera.zoom;
 
         this._renderer = new THREE.WebGLRenderer();
         this._parentElement.appendChild( this._renderer.domElement );
@@ -25,6 +28,7 @@ class Scene {
         this._controls = new THREE.OrbitControls(this._camera, this._parentElement);
         this._controls.enableZoom = false;
         this._controls.enablePan = false;
+        this._controls.enableKeys = false;
 
         this._raycaster = new THREE.Raycaster(); 
 
@@ -135,6 +139,28 @@ class Scene {
         }
 
         this._camera.updateProjectionMatrix();
+    }
+
+    rotateX(angle) {
+        const xAxis = new THREE.Vector3(1, 0, 0);
+        let quaternion = new THREE.Quaternion;
+        quaternion.setFromAxisAngle(xAxis, angle)
+        this._camera.position.applyQuaternion(quaternion);
+        this._camera.up.applyQuaternion(quaternion);
+    }
+
+    rotateY(angle) {
+        const yAxis = new THREE.Vector3(0, 1, 0);
+        let quaternion = new THREE.Quaternion;
+        quaternion.setFromAxisAngle(yAxis, angle);
+        this._camera.position.applyQuaternion(quaternion);
+        this._camera.up.applyQuaternion(quaternion);
+    }
+
+    rotateZ(angle) {
+        const zAxis = new THREE.Vector3(0, 0, 1);
+        var quaternion = new THREE.Quaternion;
+        this._camera.up.applyQuaternion(quaternion.setFromAxisAngle(zAxis, angle));
     }
 
     _hoverObject(x, y) {
@@ -256,7 +282,10 @@ class Scene {
             this._scene.remove(this._scene.children[0]);
         }
 
-        this._camera.zoom = 1.0;
+        this._camera.position.copy(this._camera_init_position);
+        this._camera.up.copy(this._camera_init_up);
+        this._camera.zoom = this._camera_init_zoom;
+        this._camera.updateProjectionMatrix();
         this._cylinder = NaN;
         this._data = NaN;
         this._sceneRadius = 0;
@@ -264,6 +293,15 @@ class Scene {
 
     _getAssetFilePath(fileName) {
         return this._assetsPath ? (this._assetsPath + "/" + fileName) : fileName;
+    }
+
+    _getCameraXAxis() {
+        let cameraVec = new THREE.Vector3( 0, 0, - 1 );
+        cameraVec.applyQuaternion( this._camera.quaternion );
+        const yAxis = new THREE.Vector3( 0, 1, 0 );
+        cameraVec.applyAxisAngle(yAxis, -Math.PI/2);
+        cameraVec.normalize();
+        return cameraVec;
     }
 }
 

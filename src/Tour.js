@@ -14,6 +14,7 @@ class Tour {
         this._parentElement.addEventListener("touchstart", (event) => {this._onTouchStart(event);});
         this._parentElement.addEventListener("touchmove", (event) => {this._onTouchMove(event);});
         this._parentElement.addEventListener("touchend", (event) => {this._onTouchEnd(event);});
+        this._parentElement.addEventListener("keydown", (event) => {this._onKeyDown(event);});
 
         this._sceneDataMap = new Map();
         this._scene = new CylindricalScene(this._parentElement);
@@ -97,6 +98,31 @@ class Tour {
         } else {
             this._scene.click(event.changedTouches[0].clientX, event.changedTouches[0].clientY);
             event.preventDefault();
+        }
+    }
+
+    _onKeyDown(event) {
+        const RotateStep = 0.05;
+
+        switch (event.keyCode) {
+            case 37: // Key LEFT
+                this._scene.rotateY(RotateStep);
+                break;
+            
+            case 39: // Key RIGHT
+                this._scene.rotateY(-RotateStep);
+                break;
+
+            case 38: // Key UP
+                this._scene.rotateX(RotateStep);
+                break;
+
+            case 40: // Key DOWN
+                this._scene.rotateX(-RotateStep);
+                break;
+
+            default:
+                break;
         }
     }
 
