@@ -50,7 +50,7 @@ class Scene {
         this._setWaiterVisibility(false);
 
         this._photoWidget = new PhotoWidget(this._parentElement);
-        this._setPhotoVisibility(false);
+        this.setPhotoVisibility(false);
 
         this._sceneObjects = new Array();
         this._hoveredSceneObject = NaN;
@@ -106,7 +106,7 @@ class Scene {
 
         if (!this._hoveredSceneObject) {
             if (this._photoWidget.isVisible()) {
-                this._setPhotoVisibility(false);
+                this.setPhotoVisibility(false);
             }
             return;
         }
@@ -120,7 +120,7 @@ class Scene {
             case SceneObjectEnum.Photo:
                 const photoPath = this._hoveredSceneObject.userData.data.image;
                 this._photoWidget.setPhoto(photoPath);
-                this._setPhotoVisibility(true);
+                this.setPhotoVisibility(true);
                 this._setSceneObjectState(this._hoveredSceneObject, SceneObjectStateEnum.Normal);
                 break;
 
@@ -161,6 +161,24 @@ class Scene {
         const zAxis = new THREE.Vector3(0, 0, 1);
         var quaternion = new THREE.Quaternion;
         this._camera.up.applyQuaternion(quaternion.setFromAxisAngle(zAxis, angle));
+    }
+
+    isPhotoVisible() {
+        return this._photoWidget.isVisible();
+    }
+
+    setPhotoVisibility(visible) {
+        if (visible) {
+            this._photoWidget.show();
+            this._nameLabel.style.visibility = "hidden";
+            this._versionLabel.style.visibility = "hidden";
+            this._fullscreenButton.hide();
+        } else {
+            this._photoWidget.hide();
+            this._nameLabel.style.visibility = "visible";
+            this._versionLabel.style.visibility = "visible";
+            this._fullscreenButton.show();
+        }
     }
 
     _hoverObject(x, y) {
@@ -257,20 +275,6 @@ class Scene {
             this._fullscreenButton.hide();
         } else {
             this._waiterWidget.hide();
-            this._nameLabel.style.visibility = "visible";
-            this._versionLabel.style.visibility = "visible";
-            this._fullscreenButton.show();
-        }
-    }
-
-    _setPhotoVisibility(visible) {
-        if (visible) {
-            this._photoWidget.show();
-            this._nameLabel.style.visibility = "hidden";
-            this._versionLabel.style.visibility = "hidden";
-            this._fullscreenButton.hide();
-        } else {
-            this._photoWidget.hide();
             this._nameLabel.style.visibility = "visible";
             this._versionLabel.style.visibility = "visible";
             this._fullscreenButton.show();

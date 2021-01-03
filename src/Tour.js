@@ -106,6 +106,12 @@ class Tour {
         const ZoomStep = 2;
 
         switch (event.keyCode) {
+            case 27: // Key ESC
+                if (this._scene.isPhotoVisible()) {
+                    this._scene.setPhotoVisibility(false);
+                }
+                break;
+
             case 37: // Key LEFT
                 this._scene.rotateY(RotateStep);
                 break;
