@@ -64,7 +64,7 @@ class Tour {
     _onMouseWheel(event) {
         event.preventDefault();
         const zoomStep = 3;
-        this._scene.zoom(event.deltaY > 0 ? zoomStep : -zoomStep);
+        this._scene.zoom(event.deltaY < 0 ? zoomStep : -zoomStep);
     }
 
     _onTouchStart(event) {
@@ -81,7 +81,7 @@ class Tour {
             event.preventDefault(); // to prevent scrolling
             event.stopPropagation();
             const touchDistance = this._getTouchDistance(event);
-            const delta = this._touchDistance - touchDistance;
+            const delta = touchDistance - this._touchDistance;
 
             if (Math.abs(delta) < TouchDeltaSensitivity) {
                 return; // to prevent scene vibrations
@@ -103,6 +103,7 @@ class Tour {
 
     _onKeyDown(event) {
         const RotateStep = 0.05;
+        const ZoomStep = 2;
 
         switch (event.keyCode) {
             case 37: // Key LEFT
@@ -114,11 +115,35 @@ class Tour {
                 break;
 
             case 38: // Key UP
-                this._scene.rotateX(RotateStep);
+                // TODO: Rotation is disabled because of the scene controls object will be invalidated after that.
+                // `controls.update()` is not working in this case.
+                // Uncomment cases 38 and 40 when the problem with controls will be fixed.
+                // this._scene.rotateX(RotateStep);
                 break;
 
             case 40: // Key DOWN
-                this._scene.rotateX(-RotateStep);
+                // this._scene.rotateX(-RotateStep);
+                break;
+
+            case 107: // Key + (numpad)
+                this._scene.zoom(ZoomStep);
+                break;
+
+            case 109: // Key - (numpad)
+                this._scene.zoom(-ZoomStep);
+                break;
+
+            case 61: // Key = (firefox)
+            case 187: // Key =
+                if (event.shiftKey) {
+                    this._scene.zoom(ZoomStep);
+                }
+                break;
+
+            case 173: // Key -
+                if (!event.shiftKey) {
+                    this._scene.zoom(-ZoomStep);
+                }
                 break;
 
             default:

@@ -130,7 +130,7 @@ class Scene {
     }
 
     zoom(delta) {
-        this._camera.zoom += delta * -this._zoomSpeed;
+        this._camera.zoom += delta * this._zoomSpeed;
 
         if (this._camera.zoom < this._zoomMin) {
             this._camera.zoom = this._zoomMin;
