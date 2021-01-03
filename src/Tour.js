@@ -6,6 +6,7 @@ class Tour {
     constructor(parentElement, _type) {
         this._parentElement = parentElement;
         this._touchDistance = 0.0;
+        this._keyboardEnabled = true;
 
         window.addEventListener("resize", (event) => {this._onResize(event);});
         this._parentElement.addEventListener("mousemove", (event) => {this._onMouseMove(event);});
@@ -27,12 +28,12 @@ class Tour {
         this._scene.setAssetsPath(assetsPath);
     }
 
-    setZoom(zoomMin, zoomMax, zoomSpeed) {
+    setZoomParameters(zoomMin, zoomMax, zoomSpeed) {
         this._scene.setZoom(zoomMin, zoomMax, zoomSpeed);
     }
 
-    setLang(lang) {
-        this._scene.setLang(lang);
+    setKeyboardEnabled(enableKeyboard) {
+        this._keyboardEnabled = enableKeyboard;
     }
 
     addScene(sceneData) {
@@ -104,6 +105,10 @@ class Tour {
     _onKeyDown(event) {
         const RotateStep = 0.05;
         const ZoomStep = 2;
+
+        if (!this._keyboardEnabled) {
+            return;
+        }
 
         switch (event.keyCode) {
             case 27: // Key ESC

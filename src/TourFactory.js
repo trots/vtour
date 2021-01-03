@@ -7,7 +7,11 @@ class TourFactory {
 
         var tour = new Tour(parentElement, tourData.type);
         tour.setAssetsPath(tourData.assetsPath);
-        tour.setZoom(tourData.zoomMin, tourData.zoomMax, tourData.zoomSpeed);
+        tour.setZoomParameters(tourData.zoomMin, tourData.zoomMax, tourData.zoomSpeed);
+
+        if ("enableKeyboard" in tourData) {
+            tour.setKeyboardEnabled(tourData.enableKeyboard);
+        }
 
         for (let i = 0; i < tourData.scenes.length; i++) {
             const sceneData = tourData.scenes[i];
