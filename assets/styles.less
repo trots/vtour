@@ -22,16 +22,28 @@
     cursor:default;
 }
 
+.vt-button {
+    width: 2.3em;
+    height: 2.3em;
+    background-color: @semitransparent-bg-color;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.vt-exit-button {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    background: @semitransparent-bg-color url("exit.png") no-repeat center;
+    background-size: 1.5em;
+}
+
 .vt-fullscreen-button {
     position: absolute;
     top: 5px;
     right: 5px;
-    width: 32px;
-    height: 24px;
-    border: 2px solid white;
-    border-radius: 5px;
-    background-color: @semitransparent-bg-color;    
-    cursor: pointer;
+    background: @semitransparent-bg-color url("fullscreen.png") no-repeat center;
+    background-size: 1.5em;
 }
 
 .vt-photo-container {

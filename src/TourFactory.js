@@ -13,6 +13,12 @@ class TourFactory {
             tour.setKeyboardEnabled(tourData.enableKeyboard);
         }
 
+        if ("exitUrl" in tourData) {
+            tour.setExitUrl(tourData.exitUrl);
+        } else {
+            tour.setExitUrl(NaN);
+        }
+
         for (let i = 0; i < tourData.scenes.length; i++) {
             const sceneData = tourData.scenes[i];
             tour.addScene(sceneData);

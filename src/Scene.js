@@ -4,6 +4,7 @@ const SceneObjectStateEnum = require("./SceneObjectStateEnum.js");
 const SceneObjectEnum = require("./SceneObjectEnum.js");
 const WaiterWidget = require("./WaiterWidget.js");
 const PhotoWidget = require("./PhotoWidget.js");
+const Button = require("./Button.js");
 const FullscreenButton = require("./FullscreenButton.js")
 
 class Scene {
@@ -30,7 +31,12 @@ class Scene {
         this._controls.enablePan = false;
         this._controls.enableKeys = false;
 
-        this._raycaster = new THREE.Raycaster(); 
+        this._raycaster = new THREE.Raycaster();
+
+        this._exitButton = new Button(this._parentElement);
+        this._exitButton.setToolTip(I18n.Dict.ExitTooltip);
+        this._exitButton.addClassName("vt-exit-button");
+        this._exitButton.addClickEventListener(() => {this.dispatchEvent( { type: "exit" } );});
 
         this._nameLabel = document.createElement("div");
         this._nameLabel.title = I18n.Dict.SceneTooltip;
@@ -163,6 +169,11 @@ class Scene {
         this._camera.up.applyQuaternion(quaternion.setFromAxisAngle(zAxis, angle));
     }
 
+    removeExitButton() {
+        this._exitButton.hide();
+        this._exitButton = NaN;
+    }
+
     isPhotoVisible() {
         return this._photoWidget.isVisible();
     }
@@ -173,11 +184,19 @@ class Scene {
             this._nameLabel.style.visibility = "hidden";
             this._versionLabel.style.visibility = "hidden";
             this._fullscreenButton.hide();
+
+            if (this._exitButton) {
+                this._exitButton.hide();
+            }
         } else {
             this._photoWidget.hide();
             this._nameLabel.style.visibility = "visible";
             this._versionLabel.style.visibility = "visible";
             this._fullscreenButton.show();
+
+            if (this._exitButton) {
+                this._exitButton.show();
+            }
         }
     }
 
@@ -273,11 +292,19 @@ class Scene {
             this._nameLabel.style.visibility = "hidden";
             this._versionLabel.style.visibility = "hidden";
             this._fullscreenButton.hide();
+
+            if (this._exitButton) {
+                this._exitButton.hide();
+            }
         } else {
             this._waiterWidget.hide();
             this._nameLabel.style.visibility = "visible";
             this._versionLabel.style.visibility = "visible";
             this._fullscreenButton.show();
+            
+            if (this._exitButton) {
+                this._exitButton.show();
+            }
         }
     }
 

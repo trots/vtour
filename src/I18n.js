@@ -5,7 +5,9 @@ var Dict = {
     FullscreenTooltip: "Switch fullscreen",
     VersionLabelTooltip: "Powered by vtour",
     PortalTooltip: "Go",
-    PhotospotTooltip: "Look closer"
+    PhotospotTooltip: "Look closer",
+    ExitTooltip: "Exit",
+    ExitQuestion: "Are you sure you want to close the tour?"
 };
 
 var SetLang = function(lang) {
@@ -18,6 +20,8 @@ var SetLang = function(lang) {
             Dict.VersionLabelTooltip = "Создано с использоанием vtour";
             Dict.PortalTooltip = "Перейти";
             Dict.PhotospotTooltip = "Рассмотреть";
+            Dict.ExitTooltip = "Выйти";
+            Dict.ExitQuestion = "Вы действительно хотите закончить виртуальный тур?";
             break;
 
         default:

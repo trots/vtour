@@ -1,5 +1,4 @@
-const SceneObjectStateEnum = require("./SceneObjectStateEnum.js");
-const SceneObjectEnum = require("./SceneObjectEnum.js");
+const I18n = require("./I18n.js");
 const CylindricalScene = require("./CylindricalScene.js");
 
 class Tour {
@@ -7,6 +6,7 @@ class Tour {
         this._parentElement = parentElement;
         this._touchDistance = 0.0;
         this._keyboardEnabled = true;
+        this._exitUrl = "";
 
         window.addEventListener("resize", (event) => {this._onResize(event);});
         this._parentElement.addEventListener("mousemove", (event) => {this._onMouseMove(event);});
@@ -20,6 +20,7 @@ class Tour {
         this._sceneDataMap = new Map();
         this._scene = new CylindricalScene(this._parentElement);
         this._scene.addEventListener("portalclicked", (event) => {this._onTransitionActivated(event);} );
+        this._scene.addEventListener("exit", (event) => {this._onExitClicked(event);} );
 
         this._scene.resize(this._parentElement.offsetWidth, this._parentElement.offsetHeight);
     }
@@ -34,6 +35,14 @@ class Tour {
 
     setKeyboardEnabled(enableKeyboard) {
         this._keyboardEnabled = enableKeyboard;
+    }
+
+    setExitUrl(url) {
+        this._exitUrl = url;
+        
+        if (!this._exitUrl) {
+            this._scene.removeExitButton();
+        }
     }
 
     addScene(sceneData) {
@@ -169,6 +178,14 @@ class Tour {
 
         const data = this._sceneDataMap.get(event.uid);
         this._scene.init(data);
+    }
+
+    _onExitClicked(_event) {
+        if (this._exitUrl) {
+            if (confirm(I18n.Dict.ExitQuestion)) {
+                window.location = this._exitUrl;
+            }
+        }
     }
 
     _getTouchDistance(event) {
