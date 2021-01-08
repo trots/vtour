@@ -121,6 +121,12 @@ class _TourData {
         return this._getValue(photo, "image", 0);
     }
 
+    getScenePhotoTitle(uid, index) {
+        const scene = this._getSceneObject(uid);
+        const photo = this._getValue(scene, "photos", [])[index];
+        return this._getValue(photo, "title", "");
+    }
+
     _getSceneObject(uid) {
         const scenes = this._getValue(this._data, "scenes", []);
 
@@ -136,7 +142,7 @@ class _TourData {
     }
 
     _getValue(data, key, defaultValue) {
-        if (key in data) {
+        if (data && (key in data)) {
             return data[key];
         }
 

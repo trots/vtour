@@ -40,6 +40,8 @@ class Scene {
             this._exitButton = NaN;
         }
 
+        this._photoWidget = new PhotoWidget(this._parentElement);
+
         this._nameLabel = document.createElement("div");
         this._nameLabel.title = I18n.Dict.SceneTooltip;
         this._nameLabel.className = "vt-scene-name-label";
@@ -57,11 +59,9 @@ class Scene {
         this._waiterWidget = new WaiterWidget(I18n.Dict.Loading, this._parentElement);
         this._setWaiterVisibility(false);
 
-        this._photoWidget = new PhotoWidget(this._parentElement);
-        this.setPhotoVisibility(false);
-
         this._sceneObjects = new Array();
         this._hoveredSceneObject = NaN;
+        this.setPhotoVisibility(false, -1);
 
         Object.assign( Scene.prototype, THREE.EventDispatcher.prototype );
     }
@@ -109,7 +109,7 @@ class Scene {
 
         if (!this._hoveredSceneObject) {
             if (this._photoWidget.isVisible()) {
-                this.setPhotoVisibility(false);
+                this.setPhotoVisibility(false, -1);
             }
             return;
         }
@@ -123,7 +123,7 @@ class Scene {
             case SceneObjectEnum.Photo:
                 const photoPath = TourData.getScenePhotoPath(this._uid, this._hoveredSceneObject.userData.photoIndex);
                 this._photoWidget.setPhoto(photoPath);
-                this.setPhotoVisibility(true);
+                this.setPhotoVisibility(true, this._hoveredSceneObject.userData.photoIndex);
                 this._setSceneObjectState(this._hoveredSceneObject, SceneObjectStateEnum.Normal);
                 break;
 
@@ -170,10 +170,10 @@ class Scene {
         return this._photoWidget.isVisible();
     }
 
-    setPhotoVisibility(visible) {
+    setPhotoVisibility(visible, photoIndex) {
         if (visible) {
             this._photoWidget.show();
-            this._nameLabel.style.visibility = "hidden";
+            this._nameLabel.innerHTML = TourData.getScenePhotoTitle(this._uid, photoIndex);
             this._versionLabel.style.visibility = "hidden";
             this._fullscreenButton.hide();
 
@@ -182,7 +182,7 @@ class Scene {
             }
         } else {
             this._photoWidget.hide();
-            this._nameLabel.style.visibility = "visible";
+            this._nameLabel.innerHTML = TourData.getSceneTitle(this._uid);
             this._versionLabel.style.visibility = "visible";
             this._fullscreenButton.show();
 
