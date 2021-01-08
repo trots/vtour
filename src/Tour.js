@@ -1,12 +1,11 @@
 const I18n = require("./I18n.js");
 const CylindricalScene = require("./CylindricalScene.js");
+var TourData = require("./TourData.js");
 
 class Tour {
-    constructor(parentElement, _type) {
+    constructor(parentElement) {
         this._parentElement = parentElement;
         this._touchDistance = 0.0;
-        this._keyboardEnabled = true;
-        this._exitUrl = "";
 
         window.addEventListener("resize", (event) => {this._onResize(event);});
         this._parentElement.addEventListener("mousemove", (event) => {this._onMouseMove(event);});
@@ -17,7 +16,6 @@ class Tour {
         this._parentElement.addEventListener("touchend", (event) => {this._onTouchEnd(event);});
         this._parentElement.addEventListener("keydown", (event) => {this._onKeyDown(event);});
 
-        this._sceneDataMap = new Map();
         this._scene = new CylindricalScene(this._parentElement);
         this._scene.addEventListener("portalclicked", (event) => {this._onTransitionActivated(event);} );
         this._scene.addEventListener("exit", (event) => {this._onExitClicked(event);} );
@@ -25,37 +23,8 @@ class Tour {
         this._scene.resize(this._parentElement.offsetWidth, this._parentElement.offsetHeight);
     }
 
-    setAssetsPath(assetsPath) {
-        this._scene.setAssetsPath(assetsPath);
-    }
-
-    setZoomParameters(zoomMin, zoomMax, zoomSpeed) {
-        this._scene.setZoom(zoomMin, zoomMax, zoomSpeed);
-    }
-
-    setKeyboardEnabled(enableKeyboard) {
-        this._keyboardEnabled = enableKeyboard;
-    }
-
-    setExitUrl(url) {
-        this._exitUrl = url;
-        
-        if (!this._exitUrl) {
-            this._scene.removeExitButton();
-        }
-    }
-
-    addScene(sceneData) {
-        this._sceneDataMap.set(sceneData.uid, sceneData);
-    }
-
-    start(entrySceneUid) {
-        if (!this._sceneDataMap.has(entrySceneUid)) {
-            throw new Error("Unable start a tour. Unknown scene UID");
-        }
-
-        const data = this._sceneDataMap.get(entrySceneUid);
-        this._scene.init(data);
+    start() {
+        this._scene.init(TourData.getEntrySceneUid());
     }
 
     _onResize(_event) {
@@ -115,7 +84,7 @@ class Tour {
         const RotateStep = 0.05;
         const ZoomStep = 2;
 
-        if (!this._keyboardEnabled) {
+        if (!TourData.isKeyboardEnabled()) {
             return;
         }
 
@@ -172,19 +141,12 @@ class Tour {
     }
 
     _onTransitionActivated(event) {
-        if (!this._sceneDataMap.has(event.uid)) {
-            throw new Error("Unable start a tour. Unknown scene UID");
-        }
-
-        const data = this._sceneDataMap.get(event.uid);
-        this._scene.init(data);
+        this._scene.init(event.uid);
     }
 
     _onExitClicked(_event) {
-        if (this._exitUrl) {
-            if (confirm(I18n.Dict.ExitQuestion)) {
-                window.location = this._exitUrl;
-            }
+        if (confirm(I18n.Dict.ExitQuestion)) {
+            window.location = TourData.getExitUrl();
         }
     }
 

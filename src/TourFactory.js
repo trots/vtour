@@ -1,30 +1,14 @@
 const I18n = require("./I18n.js");
 const Tour = require("./Tour.js");
+var TourData = require("./TourData.js");
 
 class TourFactory {
     static start(parentElement, tourData) {
-        I18n.SetLang(tourData.lang);
+        TourData.init(tourData);
+        I18n.SetLang(TourData.getLang());
 
-        var tour = new Tour(parentElement, tourData.type);
-        tour.setAssetsPath(tourData.assetsPath);
-        tour.setZoomParameters(tourData.zoomMin, tourData.zoomMax, tourData.zoomSpeed);
-
-        if ("enableKeyboard" in tourData) {
-            tour.setKeyboardEnabled(tourData.enableKeyboard);
-        }
-
-        if ("exitUrl" in tourData) {
-            tour.setExitUrl(tourData.exitUrl);
-        } else {
-            tour.setExitUrl(NaN);
-        }
-
-        for (let i = 0; i < tourData.scenes.length; i++) {
-            const sceneData = tourData.scenes[i];
-            tour.addScene(sceneData);
-        }
-
-        tour.start(tourData.entrySceneUid);
+        var tour = new Tour(parentElement);
+        tour.start();
         return tour;
     }
 }

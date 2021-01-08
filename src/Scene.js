@@ -6,15 +6,13 @@ const WaiterWidget = require("./WaiterWidget.js");
 const PhotoWidget = require("./PhotoWidget.js");
 const Button = require("./Button.js");
 const FullscreenButton = require("./FullscreenButton.js")
+var TourData = require("./TourData.js");
 
 class Scene {
     constructor(parentElement) {
         this._parentElement = parentElement;
-        this._assetsPath = "";
-        this._zoomMin = 1.0;
-        this._zoomMax = 3.0;
-        this._zoomSpeed = 0.02;
         this._sceneRadius = 0;
+        this._uid = "";
 
         this._textureLoader = new THREE.TextureLoader();
         this._scene = new THREE.Scene();
@@ -33,10 +31,14 @@ class Scene {
 
         this._raycaster = new THREE.Raycaster();
 
-        this._exitButton = new Button(this._parentElement);
-        this._exitButton.setToolTip(I18n.Dict.ExitTooltip);
-        this._exitButton.addClassName("vt-exit-button");
-        this._exitButton.addClickEventListener(() => {this.dispatchEvent( { type: "exit" } );});
+        if (TourData.getExitUrl()) {
+            this._exitButton = new Button(this._parentElement);
+            this._exitButton.setToolTip(I18n.Dict.ExitTooltip);
+            this._exitButton.addClassName("vt-exit-button");
+            this._exitButton.addClickEventListener(() => {this.dispatchEvent( { type: "exit" } );});
+        } else {
+            this._exitButton = NaN;
+        }
 
         this._nameLabel = document.createElement("div");
         this._nameLabel.title = I18n.Dict.SceneTooltip;
@@ -64,26 +66,21 @@ class Scene {
         Object.assign( Scene.prototype, THREE.EventDispatcher.prototype );
     }
 
-    setAssetsPath(assetsPath) {
-        this._assetsPath = assetsPath;
-    }
-
-    setZoom(zoomMin, zoomMax, zoomSpeed) {
-        this._zoomMin = zoomMin;
-        this._zoomMax = zoomMax;
-        this._zoomSpeed = zoomSpeed;
-    }
-
-    init(data) {
+    init(uid) {
         this._clear();
-        this._data = data;
+        this._uid = uid;
+        const image = TourData.getSceneImage(uid);
 
-        this._textureLoader.load(this._data.image, 
+        if (!image) {
+            throw new Error("No scene image by uid=" + uid);
+        }
+
+        this._textureLoader.load(image, 
             (texture) => {this._onTextureLoaded(texture);},
             undefined,
             (err) => {this._onTextureLoadError(err);});
 
-        this._nameLabel.innerHTML = this._data.title;
+        this._nameLabel.innerHTML = TourData.getSceneTitle(uid);
         this._setWaiterVisibility(true);
     }
 
@@ -119,12 +116,12 @@ class Scene {
 
         switch (this._hoveredSceneObject.userData.type) {
             case SceneObjectEnum.Portal:
-                const uid = this._hoveredSceneObject.userData.data.toUid;
+                const uid = TourData.getSceneTransitionUid(this._uid, this._hoveredSceneObject.userData.transitionIndex);
                 this.dispatchEvent( { type: "portalclicked", uid: uid } );
                 break;
 
             case SceneObjectEnum.Photo:
-                const photoPath = this._hoveredSceneObject.userData.data.image;
+                const photoPath = TourData.getScenePhotoPath(this._uid, this._hoveredSceneObject.userData.photoIndex);
                 this._photoWidget.setPhoto(photoPath);
                 this.setPhotoVisibility(true);
                 this._setSceneObjectState(this._hoveredSceneObject, SceneObjectStateEnum.Normal);
@@ -136,12 +133,12 @@ class Scene {
     }
 
     zoom(delta) {
-        this._camera.zoom += delta * this._zoomSpeed;
+        this._camera.zoom += delta * TourData.getZoomSpeed();
 
-        if (this._camera.zoom < this._zoomMin) {
-            this._camera.zoom = this._zoomMin;
-        } else if (this._camera.zoom > this._zoomMax) {
-            this._camera.zoom = this._zoomMax;
+        if (this._camera.zoom < TourData.getZoomRangeMin()) {
+            this._camera.zoom = TourData.getZoomRangeMin();
+        } else if (this._camera.zoom > TourData.getZoomRangeMax()) {
+            this._camera.zoom = TourData.getZoomRangeMax();
         }
 
         this._camera.updateProjectionMatrix();
@@ -167,11 +164,6 @@ class Scene {
         const zAxis = new THREE.Vector3(0, 0, 1);
         var quaternion = new THREE.Quaternion;
         this._camera.up.applyQuaternion(quaternion.setFromAxisAngle(zAxis, angle));
-    }
-
-    removeExitButton() {
-        this._exitButton.hide();
-        this._exitButton = NaN;
     }
 
     isPhotoVisible() {
@@ -230,10 +222,10 @@ class Scene {
     _createSceneObjects() {
         this._sceneObjects = [];
 
-        for (let i = 0; i < this._data.transitions.length; i++) {
-            const transition = this._data.transitions[i];
-            let mesh = this._createSceneObjectMesh(0xff0000, transition.point.height, transition.point.radius);
-            mesh.userData = {type: SceneObjectEnum.Portal, data: transition, tooltip: I18n.Dict.PortalTooltip};
+        for (let i = 0; i < TourData.getSceneTransitionsCount(this._uid); i++) {
+            let mesh = this._createSceneObjectMesh(0xff0000, TourData.getSceneTransitionHeight(this._uid, i),
+                                                   TourData.getSceneTransitionRadius(this._uid, i));
+            mesh.userData = {type: SceneObjectEnum.Portal, transitionIndex: i, tooltip: I18n.Dict.PortalTooltip};
 
             this._textureLoader.load(this._getAssetFilePath("portal.png"), (texture) => {
                 mesh.material.map = texture;
@@ -242,13 +234,13 @@ class Scene {
             });
 
             this._setSceneObjectState(mesh, SceneObjectStateEnum.Normal);
-            this._addSceneObject(mesh, transition.point.angle);
+            this._addSceneObject(mesh, TourData.getSceneTransitionAngle(this._uid, i));
         }
 
-        for (let i = 0; i < this._data.photos.length; i++) {
-            const photo = this._data.photos[i];
-            let mesh = this._createSceneObjectMesh(0x0000ff, photo.point.height, photo.point.radius);
-            mesh.userData = {type: SceneObjectEnum.Photo, data: photo, tooltip: I18n.Dict.PhotospotTooltip};
+        for (let i = 0; i < TourData.getScenePhotosCount(this._uid); i++) {
+            let mesh = this._createSceneObjectMesh(0x0000ff, TourData.getScenePhotoHeight(this._uid, i), 
+                                                   TourData.getScenePhotoRadius(this._uid, i));
+            mesh.userData = {type: SceneObjectEnum.Photo, photoIndex: i, tooltip: I18n.Dict.PhotospotTooltip};
 
             this._textureLoader.load(this._getAssetFilePath("photospot.png"), (texture) => {
                 mesh.material.map = texture;
@@ -257,7 +249,7 @@ class Scene {
             });
 
             this._setSceneObjectState(mesh, SceneObjectStateEnum.Normal);
-            this._addSceneObject(mesh, photo.point.angle);
+            this._addSceneObject(mesh, TourData.getScenePhotoAngle(this._uid, i));
         }
     }
 
@@ -318,12 +310,13 @@ class Scene {
         this._camera.zoom = this._camera_init_zoom;
         this._camera.updateProjectionMatrix();
         this._cylinder = NaN;
-        this._data = NaN;
+        this._uid = "";
         this._sceneRadius = 0;
     }
 
     _getAssetFilePath(fileName) {
-        return this._assetsPath ? (this._assetsPath + "/" + fileName) : fileName;
+        const assetsPath = TourData.getAssetsPath();
+        return assetsPath ? (assetsPath + "/" + fileName) : fileName;
     }
 
     _getCameraXAxis() {

@@ -7,8 +7,6 @@ class CylindricalScene extends Scene {
         this._controls.maxPolarAngle = Math.PI/2;
         this._controls.minPolarAngle = Math.PI/2;
         this._controls.rotateSpeed = -0.3;
-
-        this._data = NaN;
     }
 
     zoom(deltaY) {
