@@ -227,6 +227,11 @@ class Scene {
                                                    TourData.getSceneTransitionRadius(this._uid, i));
             mesh.userData = {type: SceneObjectEnum.Portal, transitionIndex: i, tooltip: I18n.Dict.PortalTooltip};
 
+            if (TourData.isInformativeDestinationTooltipsEnabled()) {
+                const destSceneUid = TourData.getSceneTransitionUid(this._uid, i);
+                mesh.userData.tooltip = TourData.getSceneTitle(destSceneUid);
+            }
+
             this._textureLoader.load(this._getAssetFilePath("portal.png"), (texture) => {
                 mesh.material.map = texture;
                 mesh.material.color = NaN;
@@ -241,6 +246,10 @@ class Scene {
             let mesh = this._createSceneObjectMesh(0x0000ff, TourData.getScenePhotoHeight(this._uid, i), 
                                                    TourData.getScenePhotoRadius(this._uid, i));
             mesh.userData = {type: SceneObjectEnum.Photo, photoIndex: i, tooltip: I18n.Dict.PhotospotTooltip};
+
+            if (TourData.isInformativeDestinationTooltipsEnabled()) {
+                mesh.userData.tooltip = TourData.getScenePhotoTitle(this._uid, i);
+            }
 
             this._textureLoader.load(this._getAssetFilePath("photospot.png"), (texture) => {
                 mesh.material.map = texture;

@@ -35,6 +35,10 @@ class _TourData {
         return this._getValue(this._data, "enableKeyboard", true);
     }
 
+    isInformativeDestinationTooltipsEnabled() {
+        return this._getValue(this._data, "enableInformativeDestinationTooltips", true);
+    }
+
     getExitUrl() {
         return this._getValue(this._data, "exitUrl", NaN);
     }
