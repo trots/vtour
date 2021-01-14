@@ -6,7 +6,7 @@ const WaiterWidget = require("./WaiterWidget.js");
 const PhotoWidget = require("./PhotoWidget.js");
 const Button = require("./Button.js");
 const FullscreenButton = require("./FullscreenButton.js")
-var TourData = require("./TourData.js");
+let TourData = require("./TourData.js");
 
 class Scene {
     constructor(parentElement) {
@@ -162,7 +162,7 @@ class Scene {
 
     rotateZ(angle) {
         const zAxis = new THREE.Vector3(0, 0, 1);
-        var quaternion = new THREE.Quaternion;
+        let quaternion = new THREE.Quaternion;
         this._camera.up.applyQuaternion(quaternion.setFromAxisAngle(zAxis, angle));
     }
 

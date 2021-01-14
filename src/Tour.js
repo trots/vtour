@@ -1,6 +1,6 @@
 const I18n = require("./I18n.js");
 const CylindricalScene = require("./CylindricalScene.js");
-var TourData = require("./TourData.js");
+let TourData = require("./TourData.js");
 
 class Tour {
     constructor(parentElement) {
