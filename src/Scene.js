@@ -97,7 +97,7 @@ class Scene {
     }
 
     hover(x, y) {
-        if (this._photoWidget.isVisible()) {
+        if (!this._controls.enabled) {
             return;
         }
 
@@ -105,7 +105,9 @@ class Scene {
     }
 
     click(x, y) {
-        this._hoverObject(x, y);
+        if (this._controls.enabled) {
+            this._hoverObject(x, y);
+        }
 
         if (!this._hoveredSceneObject) {
             if (this._photoWidget.isVisible()) {
@@ -133,6 +135,10 @@ class Scene {
     }
 
     zoom(delta) {
+        if (!this._controls.enabled) {
+            return false;
+        }
+
         this._camera.zoom += delta * TourData.getZoomSpeed();
 
         if (this._camera.zoom < TourData.getZoomRangeMin()) {
@@ -142,28 +148,44 @@ class Scene {
         }
 
         this._camera.updateProjectionMatrix();
+        return true;
     }
 
     rotateX(angle) {
+        if (!this._controls.enabled) {
+            return false;
+        }
+
         const xAxis = new THREE.Vector3(1, 0, 0);
         let quaternion = new THREE.Quaternion;
         quaternion.setFromAxisAngle(xAxis, angle)
         this._camera.position.applyQuaternion(quaternion);
         this._camera.up.applyQuaternion(quaternion);
+        return true;
     }
 
     rotateY(angle) {
+        if (!this._controls.enabled) {
+            return false;
+        }
+
         const yAxis = new THREE.Vector3(0, 1, 0);
         let quaternion = new THREE.Quaternion;
         quaternion.setFromAxisAngle(yAxis, angle);
         this._camera.position.applyQuaternion(quaternion);
         this._camera.up.applyQuaternion(quaternion);
+        return true;
     }
 
     rotateZ(angle) {
+        if (!this._controls.enabled) {
+            return false;
+        }
+
         const zAxis = new THREE.Vector3(0, 0, 1);
         let quaternion = new THREE.Quaternion;
         this._camera.up.applyQuaternion(quaternion.setFromAxisAngle(zAxis, angle));
+        return true;
     }
 
     isPhotoVisible() {
@@ -176,6 +198,7 @@ class Scene {
             this._nameLabel.innerHTML = TourData.getScenePhotoTitle(this._uid, photoIndex);
             this._versionLabel.style.visibility = "hidden";
             this._fullscreenButton.hide();
+            this._controls.enabled = false;
 
             if (this._exitButton) {
                 this._exitButton.hide();
@@ -185,6 +208,7 @@ class Scene {
             this._nameLabel.innerHTML = TourData.getSceneTitle(this._uid);
             this._versionLabel.style.visibility = "visible";
             this._fullscreenButton.show();
+            this._controls.enabled = true;
 
             if (this._exitButton) {
                 this._exitButton.show();

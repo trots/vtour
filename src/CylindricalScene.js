@@ -10,20 +10,28 @@ class CylindricalScene extends Scene {
     }
 
     zoom(deltaY) {
-        super.zoom(deltaY);
+        if (!super.zoom(deltaY)) {
+            return false;
+        }
+
         const viewAngleDiff = (this._camera.fov - this._camera.getEffectiveFOV()) * (Math.PI / 180);
         this._controls.maxPolarAngle = Math.PI / 2 + viewAngleDiff / 2;
         this._controls.minPolarAngle = Math.PI / 2 - viewAngleDiff / 2;
+        return true;
     }
 
     rotateX(angle) {
+        if (!this._controls.enabled) {
+            return false;
+        }
+
         const currentAngle = this._controls.getPolarAngle();
         let newAngle = currentAngle + angle;
         newAngle = Math.max( this._controls.minPolarAngle, Math.min( this._controls.maxPolarAngle, newAngle ) );
         const diff = newAngle - currentAngle;
 
         if (diff == 0) {
-            return;
+            return false;
         }
 
         const rotationVec = this._getCameraXAxis();
@@ -31,6 +39,7 @@ class CylindricalScene extends Scene {
         quaternion.setFromAxisAngle(rotationVec, diff);
         this._camera.position.applyQuaternion(quaternion);
         this._camera.up.applyQuaternion(quaternion);
+        return true;
     }
 
     _onTextureLoaded(texture) {
