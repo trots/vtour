@@ -45,12 +45,14 @@ class CylindricalScene extends Scene {
     _onTextureLoaded(texture) {
         this._sceneRadius = texture.image.width / (2 * Math.PI);
         const cylinderHeight = texture.image.height;
+        const cameraOffset = 10;
+        const cameraDistanceToScene = this._sceneRadius + cameraOffset;
 
-        this._camera.fov = Math.atan((cylinderHeight / 2) / this._sceneRadius) * 180 / Math.PI * 2;
+        this._camera.fov = Math.atan((cylinderHeight / 2) / cameraDistanceToScene) * 180 / Math.PI * 2;
         this._camera.near = 1;
         this._camera.far = this._sceneRadius + this._sceneRadius * 0.2;
         this._camera.updateProjectionMatrix();
-        this._camera.position.set( 0, 0, 10 );
+        this._camera.position.set( 0, 0, cameraOffset );
         this._camera.lookAt(0, 0, 0);
         
         const geometry = new THREE.CylinderGeometry(this._sceneRadius, this._sceneRadius, cylinderHeight, 40);
