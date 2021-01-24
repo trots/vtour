@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>vtour - Demo</title>
+        <style>
+            html, body { margin: 0; width: 100%; height: 100%; overflow: hidden;}
+            canvas { display: block; }
+        </style>
+        <link rel="stylesheet" href="vtour.css">
+    </head>
+    <body>
+        <script src="three.min.js"></script>
+        <script src="OrbitControls.js"></script>
+        <script src="vtour.min.js"></script>
+        <script>
+            var tour = TourFactory.start(document.body, {
+                entrySceneUid: "scene_0",
+                scenes: [
+                    {
+                        uid: "scene_0",
+                        title: "Scene",
+                        image: "demo_image_0.png",
+                        transitions: [
+                            {
+                                toUid: "scene_1",
+                                point: {radius: 0.6, height: 0, angle: -2.785}
+                            }
+                        ],
+                        photos: [
+                            {
+                                title: "Additional picture",
+                                image: "picture.png",
+                                point: {radius: 0.6, height: 0, angle: -1.565}
+                            }
+                        ]
+                    },
+                    {
+                        uid: "scene_1",
+                        title: "Another scene",
+                        image: "demo_image_1.png",
+                        transitions: [
+                            {
+                                toUid: "scene_0",
+                                point: {radius: 0.6, height: -125, angle: 0.0}
+                            }
+                        ]
+                    }
+                ]
+            });
+        </script>
+    </body>
+</html>
