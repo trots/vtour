@@ -1,6 +1,16 @@
 const Scene = require("./Scene.js");
 
+/**
+ * @classdesc
+ * Cylindrical panorama scene implementation
+ * 
+ * @extends Scene
+ */
 class CylindricalScene extends Scene {
+    /**
+     * @constructor
+     * @param {HTMLElement} [parentElement] - An HTML container for the scene
+     */
     constructor(parentElement) {
         super(parentElement);
 
@@ -9,8 +19,15 @@ class CylindricalScene extends Scene {
         this._controls.rotateSpeed = -0.3;
     }
 
-    zoom(deltaY) {
-        if (!super.zoom(deltaY)) {
+    /**
+     * Scales the scene
+     * 
+     * @override
+     * @param {number} delta - The zoom value. Positive to zoom in and negative to zoom out
+     * @returns {boolean} `true` if the scene is zoomed
+     */
+    zoom(delta) {
+        if (!super.zoom(delta)) {
             return false;
         }
 
@@ -20,6 +37,13 @@ class CylindricalScene extends Scene {
         return true;
     }
 
+    /**
+     * Rotates the scene around the X axis
+     * 
+     * @override
+     * @param {number} angle - The rotation angle in radians
+     * @returns {boolean} `true` if the scene is rotated
+     */
     rotateX(angle) {
         if (!this._controls.enabled) {
             return false;
@@ -42,6 +66,13 @@ class CylindricalScene extends Scene {
         return true;
     }
 
+    /**
+     * Calls automaticaly when the requested scene image is loaded
+     * 
+     * @override
+     * @param {THREE.Texture} _texture - The loaded texture object
+     * @protected
+     */
     _onTextureLoaded(texture) {
         this._sceneRadius = texture.image.width / (2 * Math.PI);
         const cylinderHeight = texture.image.height;
@@ -66,6 +97,12 @@ class CylindricalScene extends Scene {
         super._onTextureLoaded();
     }
 
+    /**
+     * Removes the all objects from the scene and set the scene as empty
+     * 
+     * @override
+     * @protected
+     */
     _clear() {
         super._clear();
         this._controls.maxPolarAngle = Math.PI/2;

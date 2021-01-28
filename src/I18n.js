@@ -1,3 +1,6 @@
+/**
+ * Main dictionary for the virtual tour standard text elements
+ */
 var Dict = {
     Loading: "Loading...",
     Close: "Close",
@@ -10,6 +13,13 @@ var Dict = {
     ExitQuestion: "Are you sure you want to close the tour?"
 };
 
+/**
+ * Sets a language for the virtual tour standard text elements
+ * 
+ * Supported laguages: en, ru
+ * 
+ * @param {string} lang - The language acronim
+ */
 var SetLang = function(lang) {
     switch (lang) {
         case "ru":
