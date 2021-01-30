@@ -6,7 +6,7 @@ let TourData = require("./TourData.js");
  * @classdesc
  * The class is the entry point of the virtual tour engine. Use it to run a virtual tour
  */
-class TourFactory {
+class VTOUR {
     /**
      * Runs the virtual tour engine with the specified configuration
      * 
@@ -50,4 +50,4 @@ class TourFactory {
     }
 }
 
-module.exports = TourFactory;
+module.exports = VTOUR;

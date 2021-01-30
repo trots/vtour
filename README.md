@@ -20,12 +20,12 @@ Include `three.min.js`, `OrbitControls.js` and `vtour.min.js`
 ```
 Start a tour in a script section
 ```
-var tour = TourFactory.start(document.body, {
+var tour = VTOUR.start(document.body, {
     entrySceneUid: "scene_0",
     scenes: [{uid: "scene_0", title: "Scene", image: "scene.jpg"}]
 });
 ```
-The `TourFactory.start()` method arguments:
+The `VTOUR.start()` method arguments:
 
 1. `document.body` - the HTML element where the panorama will be created
 1. `{...}` - the tour configuration JSON
