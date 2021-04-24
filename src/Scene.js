@@ -469,7 +469,7 @@ class Scene {
         this._sceneObjects = [];
 
         for (let i = 0; i < TourData.getSceneTransitionsCount(this._uid); i++) {
-            let mesh = this._createSceneObjectMesh(0xff0000, TourData.getSceneTransitionHeight(this._uid, i),
+            let mesh = this._createSceneObjectMesh(TourData.getSceneTransitionHeight(this._uid, i),
                                                    TourData.getSceneTransitionRadius(this._uid, i));
             mesh.userData = {type: SceneObjectEnum.Portal, transitionIndex: i, tooltip: I18n.Dict.PortalTooltip};
 
@@ -489,7 +489,7 @@ class Scene {
         }
 
         for (let i = 0; i < TourData.getScenePhotosCount(this._uid); i++) {
-            let mesh = this._createSceneObjectMesh(0x0000ff, TourData.getScenePhotoHeight(this._uid, i), 
+            let mesh = this._createSceneObjectMesh(TourData.getScenePhotoHeight(this._uid, i), 
                                                    TourData.getScenePhotoRadius(this._uid, i));
             mesh.userData = {type: SceneObjectEnum.Photo, photoIndex: i, tooltip: I18n.Dict.PhotospotTooltip};
 
@@ -511,15 +511,14 @@ class Scene {
     /**
      * Creates the mesh for the scene object
      * 
-     * @param {number} color - The hex value of the mesh material color
      * @param {number} spotHeight - The height of the mesh position
      * @param {number} spotRadius - The radius of the mesh position
      * @protected
      */
-    _createSceneObjectMesh(color, spotHeight, spotRadius) {
+    _createSceneObjectMesh(spotHeight, spotRadius) {
         const geometry = new THREE.PlaneGeometry(32, 32);
         const material = new THREE.MeshBasicMaterial(
-            { color: color, transparent: true, side: THREE.DoubleSide }
+            { color: NaN, transparent: true, side: THREE.DoubleSide }
         );
 
         let mesh = new THREE.Mesh( geometry, material);
