@@ -402,6 +402,7 @@ class Scene {
             }
         } else {
             this._photoWidget.hide();
+            this._photoWidget.setPhoto("");
             this._nameLabel.innerHTML = TourData.getSceneTitle(this._uid);
             this._versionLabel.style.visibility = "visible";
             this._fullscreenButton.show();
