@@ -1,4 +1,5 @@
 const I18n = require("./I18n.js");
+const WaiterWidget = require("./WaiterWidget.js");
 
 /**
  * @classdesc
@@ -29,6 +30,17 @@ class PhotoWidget {
         this._imageElement = document.createElement("img");
         this._imageElement.className = "vt-photo-widget";
         this._element.appendChild(this._imageElement);
+        this._imageElement.addEventListener("load", () => {this._waiterWidget.hide();});
+        this._imageElement.addEventListener("error", () => {this._waiterWidget.hide();});
+
+        /**
+         * The waiter widget. Shows "Loading..." text
+         * 
+         * @type {WaiterWidget}
+         * @protected
+         */
+         this._waiterWidget = new WaiterWidget(I18n.Dict.Loading, parentElement);
+         this._waiterWidget.hide();
 
         /**
          * The close button HTML element
@@ -50,6 +62,10 @@ class PhotoWidget {
      */
     setPhoto(photoPath) {
         this._imageElement.src = photoPath;
+
+        if (photoPath) {
+            this._waiterWidget.show();
+        }
     }
 
     /**
