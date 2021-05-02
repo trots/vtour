@@ -2,7 +2,7 @@ const Defines = require("./Defines.js");
 const I18n = require("./I18n.js");
 const SceneObjectStateEnum = require("./SceneObjectStateEnum.js");
 const SceneObjectEnum = require("./SceneObjectEnum.js");
-const WaiterWidget = require("./WaiterWidget.js");
+const TopMessageWidget = require("./TopMessageWidget.js");
 const PhotoWidget = require("./PhotoWidget.js");
 const Button = require("./Button.js");
 const FullscreenButton = require("./FullscreenButton.js")
@@ -176,13 +176,13 @@ class Scene {
         this._fullscreenButton = new FullscreenButton(this._parentElement);
 
         /**
-         * The waiter widget. Shows "Loading..." text
+         * The screen overlap message
          * 
-         * @type {WaiterWidget}
+         * @type {TopMessageWidget}
          * @protected
          */
-        this._waiterWidget = new WaiterWidget(I18n.Dict.Loading, this._parentElement);
-        this._setWaiterVisibility(false);
+        this._messageWidget = new TopMessageWidget(I18n.Dict.Loading, this._parentElement);
+        this._setMessageVisibility(false);
 
         /**
          * The scene objects array (meshes)
@@ -223,7 +223,7 @@ class Scene {
             (err) => {this._onTextureLoadError(err);});
 
         this._nameLabel.innerHTML = TourData.getSceneTitle(uid);
-        this._setWaiterVisibility(true);
+        this._setMessageVisibility(true, I18n.Dict.Loading);
     }
 
     /**
@@ -446,7 +446,7 @@ class Scene {
      * @protected
      */
     _onTextureLoaded(_texture) {
-        this._setWaiterVisibility(false);
+        this._setMessageVisibility(false);
     }
 
     /**
@@ -457,7 +457,7 @@ class Scene {
      */
     _onTextureLoadError(err) {
         console.log(err);
-        this._setWaiterVisibility(false);
+        this._setMessageVisibility(true, I18n.Dict.LoadPanoramaError);
     }
 
     /**
@@ -555,14 +555,17 @@ class Scene {
     }
 
     /**
-     * Shows/hides the waiter widget
+     * Shows/hides the overlap message widget
      * 
      * @param {boolean} visible - Set `true` to show the widget and `false` to hide one
+     * @param {string} text - Set the message text to display
      * @protected
      */
-    _setWaiterVisibility(visible) {
+    _setMessageVisibility(visible, text = "") {
+        this._messageWidget.setText(text);
+
         if (visible) {
-            this._waiterWidget.show();
+            this._messageWidget.show();
             this._nameLabel.style.visibility = "hidden";
             this._versionLabel.style.visibility = "hidden";
             this._fullscreenButton.hide();
@@ -571,7 +574,7 @@ class Scene {
                 this._exitButton.hide();
             }
         } else {
-            this._waiterWidget.hide();
+            this._messageWidget.hide();
             this._nameLabel.style.visibility = "visible";
             this._versionLabel.style.visibility = "visible";
             this._fullscreenButton.show();

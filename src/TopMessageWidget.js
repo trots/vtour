@@ -1,8 +1,8 @@
 /**
  * @classdesc
- * Provides the waiting (loading) widget to covers the all tour content
+ * Provides the overlap widget with message that covers the all tour content
  */
-class WaiterWidget {
+class TopMessageWidget {
     /**
      * @constructor
      * @param {string} text - The text to display
@@ -16,7 +16,7 @@ class WaiterWidget {
          * @protected
          */
         this._element = document.createElement("div");
-        this._element.className = "vt-waiter-widget";
+        this._element.className = "vt-top-message-widget";
         this._element.innerHTML = text;
         parentElement.appendChild(this._element);
     }
@@ -45,4 +45,4 @@ class WaiterWidget {
     }
 }
 
-module.exports = WaiterWidget;
+module.exports = TopMessageWidget;

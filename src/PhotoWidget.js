@@ -1,5 +1,5 @@
 const I18n = require("./I18n.js");
-const WaiterWidget = require("./WaiterWidget.js");
+const TopMessageWidget = require("./TopMessageWidget.js");
 
 /**
  * @classdesc
@@ -36,10 +36,10 @@ class PhotoWidget {
         /**
          * The waiter widget. Shows "Loading..." text
          * 
-         * @type {WaiterWidget}
+         * @type {TopMessageWidget}
          * @protected
          */
-         this._waiterWidget = new WaiterWidget(I18n.Dict.Loading, parentElement);
+         this._waiterWidget = new TopMessageWidget(I18n.Dict.Loading, parentElement);
          this._waiterWidget.hide();
 
         /**

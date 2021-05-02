@@ -10,7 +10,8 @@ var Dict = {
     PortalTooltip: "Go",
     PhotospotTooltip: "Look closer",
     ExitTooltip: "Exit",
-    ExitQuestion: "Are you sure you want to close the tour?"
+    ExitQuestion: "Are you sure you want to close the tour?",
+    LoadPanoramaError: "Unable to load a panorama image",
 };
 
 /**
@@ -32,6 +33,7 @@ var SetLang = function(lang) {
             Dict.PhotospotTooltip = "Рассмотреть";
             Dict.ExitTooltip = "Выйти";
             Dict.ExitQuestion = "Вы действительно хотите закончить виртуальный тур?";
+            Dict.LoadPanoramaError = "Ошибка загрузки панорамы";
             break;
 
         default:
