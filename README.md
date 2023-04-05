@@ -1,12 +1,14 @@
-# vtour
+<img src="examples/picture.png" height="100"/>
 
-## JavaScript Cylindrical Panorama Viewer
-
-The `vtour` is a javascript tool to build and view virtual 3D tours with cylindrical panorams. It is built on top of [three.js](https://github.com/mrdoob/three.js)
+vtour is a JavaScript library to create and view the cylindrical panoramas.
 
 Features:
-- Create virtual 3D tours with transitions between multiple cylindrical panoramas
-- Specify photospots to show additional photos of a panorama image objects
+- Create virtual 3D tours with transitions between multiple cylindrical panoramas,
+- Specify photospots to show additional pictures on a panorama scene.
+
+[View Demo](https://trots.github.io/vtour/).
+
+Built on top of the [three.js](https://github.com/mrdoob/three.js).
 
 ## Usage
 
